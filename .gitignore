@@ -1,0 +1,46 @@
+# Dependencies & build output
+node_modules/
+.output/
+.wxt/
+dist/
+*.zip
+*.xpi
+coverage/
+playwright-report/
+test-results/
+
+# Local CMS dev server (cloned separately, see docs/dev-server.md)
+cms-server/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# ---- AI / agent files (keep out of the public repo) ----
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+GEMINI.md
+*Master Plan*.md
+.claude/
+.cursor/
+.cursorrules
+.cursorignore
+.windsurf/
+.windsurfrules
+.aider*
+.codex/
+.gemini/
+.continue/
+.clinerules
+.roo/
+.github/copilot-instructions.md
+.mcp.json
