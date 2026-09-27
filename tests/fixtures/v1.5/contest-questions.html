@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="../../static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../../static/reset.css">
+    <link rel="stylesheet" type="text/css" href="../../static/aws_style.css">
+    <script src="../../static/web_rpc.js"></script>
+    <script src="../../static/aws_utils.js"></script>
+    <script src="../../static/jq/jquery-3.6.0.min.js"></script>
+    <script src="../../static/jq/jquery.jqplot.min.js"></script>
+    <script src="../../static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="../../static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="../../static/sh/shCore.js"></script>
+    <script src="../../static/sh/shBrushCpp.js"></script>
+    <script src="../../static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/sh/shThemeDefault.css"/>
+
+    <title>Admin: Test Contest</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils("../..", 1790497341.525934,
+        1790489797.0, 1790507797.0,
+        1893456000.0, 1893456000.0,
+        0);
+
+    utils.update_remaining_time();
+    var timer = setInterval(function() { utils.update_remaining_time(timer); }, 1000);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+
+utils.show_page("questions", 1);
+
+}
+
+function question_reply_toggle(element, invoker)
+{
+  var obj = document.getElementsByClassName("reply_question")[element];
+  if (obj.style.display != "block")
+    {
+      obj.style.display = "block";
+      invoker.innerHTML = "Hide reply";
+    }
+  else
+    {
+      obj.style.display = "none";
+      invoker.innerHTML = "Reply";
+    }
+  return false;
+}
+
+function update_additional_answer(element, invoker)
+{
+  var obj = document.getElementsByClassName("alternative_answer")[element];
+  if (invoker.selectedIndex == 5)
+    obj.style.display = "block";
+  else
+    obj.style.display = "none";
+}
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="../../admins">admin</a>.
+              <form class="inline" action="../../logout" method="POST"><input type="hidden" name="_xsrf" value="2|9c6c79c9|416b11a8110e653f3ebbc50c37f7d3e1|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent"><a href="../..">Administration</a></h1>
+          <h1 class="child">test</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          4ab3fe1b95a124710db6d2e09c9e78d8
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href="../../contest/1/overview">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="../../contest/1/resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+          <ul class="menu">
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1">General</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/ranking">Ranking</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/submissions">Submissions</a></li>
+<li class="menu_entry"><a class="menu_link" href="../../contest/1/user_tests">User tests</a></li>            <li class="menu_entry"><a class="menu_link" href="../../contest/1/users">Users</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/tasks">Tasks</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/announcements">Announcements</a></li>
+            <li class="menu_entry">
+              <span id="unanswered_questions" class="unread"
+>
+                2
+              </span>
+              <a class="menu_link" href="../../contest/1/questions">Questions</a>
+            </li>
+          </ul>
+          <div class="hr"></div>
+          <div class="footer">
+            <span id="remaining_text"></span>
+            <span id="remaining_value"></span>
+          </div>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+
+<div class="core_title">
+  <h1>Questions</h1>
+</div>
+
+<div id="questions" class="notifications">
+  <div id="page_selector_questions"></div>
+  <div id="paged_content_questions">
+  <div class="notification communication ">
+    <div class="notification_msg">
+      <div class="notification_timestamp">
+        <a href="../../contest/1/user/3/edit" title="Kanya Boonmee">stu003</a> &mdash; 2026-09-27 08:14:51.248675
+      </div>
+      <div class="notification_subject">&lt;b&gt;Tag&lt;/b&gt; &amp; &#34;quotes&#34;</div>
+      <div class="notification_text preserve_line_breaks">Checks that the helper escapes &lt;script&gt;x&lt;/script&gt;.</div>
+      <hr>
+      <div class="notification_subject">Not yet replied.</div>
+      <hr>
+      <div class="claim_reply">
+        <form class="claim_question_form" action="../../contest/1/question/3/claim" name="claim3" method="POST">
+          <input type="hidden" name="_xsrf" value="2|9c6c79c9|416b11a8110e653f3ebbc50c37f7d3e1|1790497340"/>
+          <input type="hidden" name="claim" value="yes"/>
+          <a href="javascript:void(0);" onclick="document.claim3.submit();">Claim</a>
+        </form>
+      </div>
+      <div class="ignore_reply">
+        <form class="ignore_question_form" action="../../contest/1/question/3/ignore" name="ignore3" method="POST">
+          <input type="hidden" name="_xsrf" value="2|9c6c79c9|416b11a8110e653f3ebbc50c37f7d3e1|1790497340"/>
+          <input type="hidden" name="ignore" value="yes"/>
+          <a href="javascript:void(0);" onclick="document.ignore3.submit();">Ignore</a>
+        </form>
+      </div>
+      <div class="reply_question_toggle">
+        <a href="javascript:void(0);" onclick="return question_reply_toggle(0, this);">
+          Reply
+        </a>
+      </div>
+      <div class="reply_question" >
+        <hr/>
+        <form class="reply_question_form" action="../../contest/1/question/3/reply" method="POST">
+          <input type="hidden" name="_xsrf" value="2|9c6c79c9|416b11a8110e653f3ebbc50c37f7d3e1|1790497340"/>
+          Precompiled answer:
+          <select name="reply_question_quick_answer" onchange="update_additional_answer(0, this);">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="answered">Answered in task description</option>
+            <option value="invalid">Invalid question</option>
+            <option value="nocomment">No comment</option>
+            <option selected value="other">Other</option>
+          </select>
+          <br/>
+          <div class="alternative_answer">
+            Alternative answer:<br/>
+            <textarea name="reply_question_text"></textarea><br/>
+          </div>
+          <input type="submit" value="Send"/>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="notification communication answered">
+    <div class="notification_msg">
+      <div class="notification_timestamp">
+        <a href="../../contest/1/user/2/edit" title="Somchai Wongsa">stu002</a> &mdash; 2026-09-27 07:39:51.248675
+      </div>
+      <div class="notification_subject">Task max: output format</div>
+      <div class="notification_text preserve_line_breaks">Should I print a newline at the end?</div>
+      <hr>
+      <div class="notification_subject">Reply: Answered in task description</div>
+      <div class="notification_text preserve_line_breaks">Either is fine.</div>
+      <hr>
+      <div class="notification_admin_owner">
+        Reply from: &lt;unknown&gt;</div>
+      <div class="reply_question_toggle">
+        <a href="javascript:void(0);" onclick="return question_reply_toggle(1, this);">
+          Edit reply
+        </a>
+      </div>
+      <div class="reply_question" >
+        <hr/>
+        <form class="reply_question_form" action="../../contest/1/question/2/reply" method="POST">
+          <input type="hidden" name="_xsrf" value="2|9c6c79c9|416b11a8110e653f3ebbc50c37f7d3e1|1790497340"/>
+          Precompiled answer:
+          <select name="reply_question_quick_answer" onchange="update_additional_answer(1, this);">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="answered">Answered in task description</option>
+            <option value="invalid">Invalid question</option>
+            <option value="nocomment">No comment</option>
+            <option selected value="other">Other</option>
+          </select>
+          <br/>
+          <div class="alternative_answer">
+            Alternative answer:<br/>
+            <textarea name="reply_question_text"></textarea><br/>
+          </div>
+          <input type="submit" value="Send"/>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="notification communication ">
+    <div class="notification_msg">
+      <div class="notification_timestamp">
+        <a href="../../contest/1/user/1/edit" title="Arthit Srisuk">stu001</a> &mdash; 2026-09-27 07:29:51.248675
+      </div>
+      <div class="notification_subject">Task sum: input size</div>
+      <div class="notification_text preserve_line_breaks">Can A and B be negative?</div>
+      <hr>
+      <div class="notification_subject">Not yet replied.</div>
+      <hr>
+      <div class="claim_reply">
+        <form class="claim_question_form" action="../../contest/1/question/1/claim" name="claim1" method="POST">
+          <input type="hidden" name="_xsrf" value="2|9c6c79c9|416b11a8110e653f3ebbc50c37f7d3e1|1790497340"/>
+          <input type="hidden" name="claim" value="yes"/>
+          <a href="javascript:void(0);" onclick="document.claim1.submit();">Claim</a>
+        </form>
+      </div>
+      <div class="ignore_reply">
+        <form class="ignore_question_form" action="../../contest/1/question/1/ignore" name="ignore1" method="POST">
+          <input type="hidden" name="_xsrf" value="2|9c6c79c9|416b11a8110e653f3ebbc50c37f7d3e1|1790497340"/>
+          <input type="hidden" name="ignore" value="yes"/>
+          <a href="javascript:void(0);" onclick="document.ignore1.submit();">Ignore</a>
+        </form>
+      </div>
+      <div class="reply_question_toggle">
+        <a href="javascript:void(0);" onclick="return question_reply_toggle(2, this);">
+          Reply
+        </a>
+      </div>
+      <div class="reply_question" >
+        <hr/>
+        <form class="reply_question_form" action="../../contest/1/question/1/reply" method="POST">
+          <input type="hidden" name="_xsrf" value="2|9c6c79c9|416b11a8110e653f3ebbc50c37f7d3e1|1790497340"/>
+          Precompiled answer:
+          <select name="reply_question_quick_answer" onchange="update_additional_answer(2, this);">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="answered">Answered in task description</option>
+            <option value="invalid">Invalid question</option>
+            <option value="nocomment">No comment</option>
+            <option selected value="other">Other</option>
+          </select>
+          <br/>
+          <div class="alternative_answer">
+            Alternative answer:<br/>
+            <textarea name="reply_question_text"></textarea><br/>
+          </div>
+          <input type="submit" value="Send"/>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </body>
+</html>

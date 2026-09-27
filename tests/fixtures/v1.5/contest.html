@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="../static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../static/reset.css">
+    <link rel="stylesheet" type="text/css" href="../static/aws_style.css">
+    <script src="../static/web_rpc.js"></script>
+    <script src="../static/aws_utils.js"></script>
+    <script src="../static/jq/jquery-3.6.0.min.js"></script>
+    <script src="../static/jq/jquery.jqplot.min.js"></script>
+    <script src="../static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="../static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="../static/sh/shCore.js"></script>
+    <script src="../static/sh/shBrushCpp.js"></script>
+    <script src="../static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/sh/shThemeDefault.css"/>
+
+    <title>Admin: Test Contest</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils("..", 1790497340.988257,
+        1790489797.0, 1790507797.0,
+        1893456000.0, 1893456000.0,
+        0);
+
+    utils.update_remaining_time();
+    var timer = setInterval(function() { utils.update_remaining_time(timer); }, 1000);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+}
+
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="../admins">admin</a>.
+              <form class="inline" action="../logout" method="POST"><input type="hidden" name="_xsrf" value="2|96bac5be|4bbdaddf1bd8d948346d797b3d216f96|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent"><a href="..">Administration</a></h1>
+          <h1 class="child">test</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          d37cb00c6554e311d1e6f710e7c09d8d
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href="../contest/1/overview">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="../contest/1/resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+          <ul class="menu">
+            <li class="menu_entry"><a class="menu_link" href="../contest/1">General</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../contest/1/ranking">Ranking</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../contest/1/submissions">Submissions</a></li>
+<li class="menu_entry"><a class="menu_link" href="../contest/1/user_tests">User tests</a></li>            <li class="menu_entry"><a class="menu_link" href="../contest/1/users">Users</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../contest/1/tasks">Tasks</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../contest/1/announcements">Announcements</a></li>
+            <li class="menu_entry">
+              <span id="unanswered_questions" class="unread"
+>
+                2
+              </span>
+              <a class="menu_link" href="../contest/1/questions">Questions</a>
+            </li>
+          </ul>
+          <div class="hr"></div>
+          <div class="footer">
+            <span id="remaining_text"></span>
+            <span id="remaining_value"></span>
+          </div>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+<div class="core_title">
+  <h1>Contest configuration</h1>
+</div>
+
+
+
+
+<!-- We use "multipart/form-data" to have Tornado distinguish between missing and empty values. -->
+<form enctype="multipart/form-data" action="../contest/1" method="POST" name="edit_contest" style="display:inline;">
+  <input type="hidden" name="_xsrf" value="2|96bac5be|4bbdaddf1bd8d948346d797b3d216f96|1790497340"/>
+  <table class="sub_table">
+    <tr><td colspan=2><h2>Contest information</h2></td></tr>
+    <tr>
+      <td>
+        <span class="info" title="A short name for the contest, preferably using only letters, numbers and underscores."></span>
+        Name
+      </td>
+      <td><input type="text" name="name" value="test"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The name of the contest as seen by the contestants."></span>
+        Description
+      </td>
+      <td><textarea name="description">Test Contest</textarea></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The list of languages that contestants can use, or empty for allowing any language.
+                                  Example: 'en,ja' (without quotes)."></span>
+        Allowed localizations
+      </td>
+      <td><input type="text" name="allowed_localizations" value=""/></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Programming languages that contestants can use to solve the tasks.
+                                  All the allowed languages must have task support, for example in managed tasks."></span>
+        Allowed programming languages
+      </td>
+      <td class="wrapping-options">
+          <label><input type="checkbox" name="languages" value="C# / Mono" >C# / Mono</label>
+          <label><input type="checkbox" name="languages" value="C++11 / g++" >C++11 / g++</label>
+          <label><input type="checkbox" name="languages" value="C++14 / g++" >C++14 / g++</label>
+          <label><input type="checkbox" name="languages" value="C++17 / g++" checked>C++17 / g++</label>
+          <label><input type="checkbox" name="languages" value="C++20 / g++" >C++20 / g++</label>
+          <label><input type="checkbox" name="languages" value="C11 / gcc" >C11 / gcc</label>
+          <label><input type="checkbox" name="languages" value="Haskell / ghc" >Haskell / ghc</label>
+          <label><input type="checkbox" name="languages" value="Java / JDK" >Java / JDK</label>
+          <label><input type="checkbox" name="languages" value="PHP" >PHP</label>
+          <label><input type="checkbox" name="languages" value="Pascal / fpc" >Pascal / fpc</label>
+          <label><input type="checkbox" name="languages" value="Python 3 / CPython" checked>Python 3 / CPython</label>
+          <label><input type="checkbox" name="languages" value="Python 3 / PyPy" >Python 3 / PyPy</label>
+          <label><input type="checkbox" name="languages" value="Rust" >Rust</label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Whether contestants can download their own submissions."></span>
+        <label for="submissions_download_allowed">Submissions download allowed</label>
+      </td>
+      <td>
+        <input type="checkbox" id="submissions_download_allowed" name="submissions_download_allowed" checked/>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Whether contestants can submit questions."></span>
+        <label for="allow_questions">Allow questions</label>
+      </td>
+      <td>
+        <input type="checkbox" id="allow_questions" name="allow_questions" checked/>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Whether contestants can submit user tests."></span>
+        <label for="allow_user_tests">Allow user tests</label>
+      </td>
+      <td>
+        <input type="checkbox" id="allow_user_tests" name="allow_user_tests" checked/>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The number of decimal places the scores will be rounded to.
+                                  Example: '2' to allow 98.76."></span>
+        Score decimal places
+      </td>
+      <td><input type="text" name="score_precision" value="0"></td>
+    </tr>
+
+    <tr><td colspan=2><h2>Logging in</h2></td></tr>
+    <tr>
+      <td>
+        <span class="info" title="If checked, contestants that are marked as hidden in this contest will not be able to log in."></span>
+        <label for="block_hidden_participations">Block hidden participations</label>
+      </td>
+      <td>
+        <input type="checkbox" id="block_hidden_participations" name="block_hidden_participations" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="If checked, contestants will be able to log in using username and password."></span>
+        <label for="allow_password_authentication">Allow password authentication</label>
+      </td>
+      <td>
+        <input type="checkbox" id="allow_password_authentication" name="allow_password_authentication" checked/>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="If checked, contestants will be able to autonomously create a user account and a participation in the contest."></span>
+        <label for="allow_registration">Allow registration</label>
+      </td>
+      <td>
+        <input type="checkbox" id="allow_registration" name="allow_registration" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="If true, contestants with an IP address specified for this contest will only be able to log in from that address."></span>
+        <label for="ip_restriction">IP based login restriction</label>
+      </td>
+      <td>
+        <input type="checkbox" id="ip_restriction" name="ip_restriction" checked/>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="If true, contestants with an IP address specified for this contest will be automatically logged in when connecting from that address."></span>
+        <label for="ip_autologin">IP based autologin</label>
+      </td>
+      <td>
+        <input type="checkbox" id="ip_autologin" name="ip_autologin" />
+      </td>
+    </tr>
+
+    <tr><td colspan=2><h2>Tokens parameters (<a href="http://cms.readthedocs.org/en/v1.5/Configuring%20a%20contest.html#feedback-to-contestants" target="_blank">documentation</a>)</h2></td></tr>
+    <tr>
+      <td>
+        <span class="info" title="Select 'disabled' to remove tokens completely, 'infinite' for allowing any number of tokens, or 'finite' to specify the amount with the following parameters.
+                                  If you prefer to control tokens at the task level, select 'infinite' here."></span>
+        Token mode
+      </td>
+      <td>
+        <select name="token_mode">
+          <option value="disabled" selected>Disabled</option>
+          <option value="finite" >Finite</option>
+          <option value="infinite" >Infinite</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The maximum number of tokens a contestant can use in the whole contest.
+                                  It is used only if tokens are finite."></span>
+        Maximum number of tokens
+      </td>
+      <td><input type="text" name="token_max_number" value="" size="3"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The minimum amount of time (in seconds) that a contestant needs to wait after using a token before being able to use another.
+                                  It is used only if tokens are finite."></span>
+        Minimum interval between tokens
+      </td>
+      <td><input type="text" name="token_min_interval" value="0" size="3"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The number of tokens that a contestant has available when their contest time starts.
+                                  It is used only if tokens are finite."></span>
+        Initial number of tokens
+      </td>
+      <td><input type="text" name="token_gen_initial" value="2" size="3"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The number of tokens that are generated periodically.
+                                  It is used only if tokens are finite."></span>
+        Token generation number
+      </td>
+      <td><input type="text" name="token_gen_number" value="2" size="3"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The amount of time (in minutes) between two token generation events.
+                                  It is used only if tokens are finite."></span>
+        Token generation period
+      </td>
+      <td><input type="text" name="token_gen_interval" value="30" size="3"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Maximum number of tokens available to a contestant at any given time during the contest.
+                                  It is used only if tokens are finite."></span>
+        Maximum accumulated tokens
+      </td>
+      <td><input type="text" name="token_gen_max" value="" size="3"></td>
+    </tr>
+
+    <tr><td colspan=2><h2>Times</h2></td></tr>
+    <tr>
+      <td>
+        <span class="info" title="Start time of the contest in the UTC timezone.
+                                  Example: '2015-12-31 15:00:00'."></span>
+        Start time (in UTC)
+      </td>
+      <td><input type="text" name="start" value="2026-09-27 06:16:37"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="End time of the contest in the UTC timezone.
+                                  Example: '2015-12-31 18:00:00'."></span>
+        End time (in UTC)
+      </td>
+      <td><input type="text" name="stop" value="2026-09-27 11:16:37"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Timezone of the server, used to display start, end times and the current server time to contestants.
+                                  Example: 'Europe/Rome', 'America/New_York', ..."></span>
+        Timezone
+      </td>
+      <td><input type="text" name="timezone" value="Asia/Bangkok"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Length of the contest (in seconds) for each contestant.
+                                  If not specified, each contestant can submit solutions for the whole duration of the contest.
+                                  If specified, only up to this length after the first log in (or up to the end of the contest, whichever comes first)."></span>
+        Length of the contest
+      </td>
+      <td><input type="text" name="per_user_time" value=""></td>
+    </tr>
+
+    <tr><td colspan=2><h2>Limits</h2></td></tr>
+    <tr>
+      <td>
+        <span class="info" title="Maximum number of submissions each contestant can submit, for the whole contest.
+                                  Leave empty for no limits."></span>
+        Maximum number of submissions
+      </td>
+      <td><input type="text" name="max_submission_number" value=""></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Maximum number of user tests each contestant can submit, for the whole contest.
+                                  Leave empty for no limits."></span>
+        Maximum number of user tests
+      </td>
+      <td><input type="text" name="max_user_test_number" value=""></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The minimum amount of time (in seconds) that a contestant needs to wait after a submission before being able to submit another.
+                                  Leave empty for no limits."></span>
+        Minimum interval between submissions
+      </td>
+      <td><input type="text" name="min_submission_interval" value=""></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="The minimum amount of time (in seconds) that a contestant needs to wait after a user test before being able to send another.
+                                  Leave empty for no limits."></span>
+        Minimum interval between user tests
+      </td>
+      <td><input type="text" name="min_user_test_interval" value=""></td>
+    </tr>
+    <tr><td colspan=2><h2>Analysis mode</h2></td></tr>
+    <tr>
+      <td>
+        <span class="info" title="If true, analysis mode for this contest will be enabled."></span>
+        Enabled
+      </td>
+      <td>
+        <input type="checkbox" id="analysis_enabled" name="analysis_enabled" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="Start time of the analysis mode in the UTC timezone.
+                                  Example: '2015-12-31 15:00:00'."></span>
+        Analysis mode start time (in UTC)
+      </td>
+      <td><input type="text" name="analysis_start" value="2030-01-01 00:00:00"></td>
+    </tr>
+    <tr>
+      <td>
+        <span class="info" title="End time of the analysis mode in the UTC timezone.
+                                  Example: '2015-12-31 18:00:00'."></span>
+        Analysis mode end time (in UTC)
+      </td>
+      <td><input type="text" name="analysis_stop" value="2030-01-01 00:00:00"></td>
+    </tr>
+  </table>
+  <input type="submit"
+         value="Update"
+         >
+  <input type="reset" value="Reset">
+</form>
+<form action="../contests" method="POST" style="display:inline;">
+    <input type="hidden" name="_xsrf" value="2|96bac5be|4bbdaddf1bd8d948346d797b3d216f96|1790497340"/>
+    <input type="hidden" name="contest_id" value="1"/>
+    <input type="submit"
+         name="operation"
+         value="Remove" style="float: right;"
+         />
+</form>
+
+
+      </div>
+
+    </div>
+  </body>
+</html>

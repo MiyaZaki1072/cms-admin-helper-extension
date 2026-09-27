@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="../../static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../../static/reset.css">
+    <link rel="stylesheet" type="text/css" href="../../static/aws_style.css">
+    <script src="../../static/web_rpc.js"></script>
+    <script src="../../static/aws_utils.js"></script>
+    <script src="../../static/jq/jquery-3.6.0.min.js"></script>
+    <script src="../../static/jq/jquery.jqplot.min.js"></script>
+    <script src="../../static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="../../static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="../../static/sh/shCore.js"></script>
+    <script src="../../static/sh/shBrushCpp.js"></script>
+    <script src="../../static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/sh/shThemeDefault.css"/>
+
+    <title>Admin: Test Contest</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils("../..", 1790497341.388378,
+        1790489797.0, 1790507797.0,
+        1893456000.0, 1893456000.0,
+        0);
+
+    utils.update_remaining_time();
+    var timer = setInterval(function() { utils.update_remaining_time(timer); }, 1000);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+}
+
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="../../admins">admin</a>.
+              <form class="inline" action="../../logout" method="POST"><input type="hidden" name="_xsrf" value="2|f3b82d18|2ebf45797eda31ee516f91dd58238730|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent"><a href="../..">Administration</a></h1>
+          <h1 class="child">test</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          d2d7bf5c89bda37ba9d7756953fb8b0e
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href="../../contest/1/overview">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="../../contest/1/resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+          <ul class="menu">
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1">General</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/ranking">Ranking</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/submissions">Submissions</a></li>
+<li class="menu_entry"><a class="menu_link" href="../../contest/1/user_tests">User tests</a></li>            <li class="menu_entry"><a class="menu_link" href="../../contest/1/users">Users</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/tasks">Tasks</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/announcements">Announcements</a></li>
+            <li class="menu_entry">
+              <span id="unanswered_questions" class="unread"
+>
+                2
+              </span>
+              <a class="menu_link" href="../../contest/1/questions">Questions</a>
+            </li>
+          </ul>
+          <div class="hr"></div>
+          <div class="footer">
+            <span id="remaining_text"></span>
+            <span id="remaining_value"></span>
+          </div>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+<div class="core_title">
+  <h1>Ranking</h1>
+</div>
+Download as <a href="../../contest/1/ranking/csv">csv</a>, <a href="../../contest/1/ranking/txt">text</a>.
+<table id="ranking-table" class="bordered">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>User</th>
+      <th>Team</th>
+      <th data-sort-settings="numeric reversed"><a href="../../task/1">sum</a></th>
+      <th data-sort-settings="numeric reversed"><a href="../../task/2">max</a></th>
+      <th data-sort-settings="numeric reversed">Global</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="../../contest/1/user/18/edit">stu018</a></td>
+      <td>Suda Wongsa</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/39/edit">stu039</a></td>
+      <td>Ploy Rattana</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>60.0</td>
+      <td>0.0</td>
+      <td>60.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/44/edit">stu044</a></td>
+      <td>Nok Chaiyaporn</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/13/edit">stu013</a></td>
+      <td>Niran Boonmee</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>60.0</td>
+      <td>80.0</td>
+      <td>140.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/29/edit">stu029</a></td>
+      <td>Malee Thongdee</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>60.0</td>
+      <td>80.0</td>
+      <td>140.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/32/edit">stu032</a></td>
+      <td>Nok Boonmee</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/2/edit">stu002</a></td>
+      <td>Somchai Wongsa</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>100.0</td>
+      <td>40.0</td>
+      <td>140.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/10/edit">stu010</a></td>
+      <td>Wichai Panya</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>100.0</td>
+      <td>0.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/38/edit">stu038</a></td>
+      <td>Niran Wongsa</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/31/edit">stu031</a></td>
+      <td>Krit Rattana</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/4/edit">stu004</a></td>
+      <td>Anan Srisuk</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/27/edit">stu027</a></td>
+      <td>Wichai Srisuk</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/12/edit">stu012</a></td>
+      <td>Kanya Thongdee</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>100.0</td>
+      <td>80.0</td>
+      <td>180.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/21/edit">stu021</a></td>
+      <td>Malee Srisuk</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/8/edit">stu008</a></td>
+      <td>Somchai Srisuk</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/30/edit">stu030</a></td>
+      <td>Prasert Panya</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>60.0</td>
+      <td>100.0</td>
+      <td>160.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/48/edit">stu048</a></td>
+      <td>Krit Thongdee</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>60.0</td>
+      <td>100.0</td>
+      <td>160.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/34/edit">stu034</a></td>
+      <td>Somchai Boonmee</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>0.0</td>
+      <td>80.0</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/9/edit">stu009</a></td>
+      <td>Kanya Boonmee</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>100.0</td>
+      <td>0.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/26/edit">stu026</a></td>
+      <td>Mali Kongkaew</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/41/edit">stu041</a></td>
+      <td>Suda Boonmee</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>60.0</td>
+      <td>40.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/35/edit">stu035</a></td>
+      <td>Chai Wongsa</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>60.0</td>
+      <td>80.0</td>
+      <td>140.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/1/edit">stu001</a></td>
+      <td>Arthit Srisuk</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/45/edit">stu045</a></td>
+      <td>Wichai Boonmee</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>100.0</td>
+      <td>0.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/37/edit">stu037</a></td>
+      <td>Fah Srisuk</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/25/edit">stu025</a></td>
+      <td>Chai Jaidee</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/17/edit">stu017</a></td>
+      <td>Mali Saetang</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/16/edit">stu016</a></td>
+      <td>Chai Chaiyaporn</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>100.0</td>
+      <td>0.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/46/edit">stu046</a></td>
+      <td>Anan Kongkaew</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/19/edit">stu019</a></td>
+      <td>Anan Boonmee</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>60.0</td>
+      <td>100.0</td>
+      <td>160.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/23/edit">stu023</a></td>
+      <td>Suda Rattana</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/20/edit">stu020</a></td>
+      <td>Chai Rattana</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>100.0</td>
+      <td>40.0</td>
+      <td>140.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/28/edit">stu028</a></td>
+      <td>Krit Saetang</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>60.0</td>
+      <td>80.0</td>
+      <td>140.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/42/edit">stu042</a></td>
+      <td>Arthit Wongsa</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>60.0</td>
+      <td>0.0</td>
+      <td>60.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/6/edit">stu006</a></td>
+      <td>Malee Panya</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/22/edit">stu022</a></td>
+      <td>Niran Srisuk</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/33/edit">stu033</a></td>
+      <td>Mali Srisuk</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/24/edit">stu024</a></td>
+      <td>Nok Wongsa</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/15/edit">stu015</a></td>
+      <td>Prasert Jaidee</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/47/edit">stu047</a></td>
+      <td>Niran Wongsa</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>100.0</td>
+      <td>80.0</td>
+      <td>180.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/36/edit">stu036</a></td>
+      <td>Malee Boonmee</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>100.0</td>
+      <td>100.0</td>
+      <td>200.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/3/edit">stu003</a></td>
+      <td>Kanya Boonmee</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/43/edit">stu043</a></td>
+      <td>Mali Srisuk</td>
+        <td><a href="../../team/3">Team CNX01</a></td>
+      <td>60.0</td>
+      <td>80.0</td>
+      <td>140.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/5/edit">stu005</a></td>
+      <td>Arthit Thongdee</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/40/edit">stu040</a></td>
+      <td>Anan Rattana</td>
+        <td><a href="../../team/5">Team HDY01</a></td>
+      <td>60.0</td>
+      <td>100.0</td>
+      <td>160.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/14/edit">stu014</a></td>
+      <td>Ploy Panya</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>0.0</td>
+      <td>80.0</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/11/edit">stu011</a></td>
+      <td>Somchai Thongdee</td>
+        <td><a href="../../team/1">Team BKK01</a></td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/7/edit">stu007</a></td>
+      <td>Niran Jaidee</td>
+        <td><a href="../../team/2">Team BKK02</a></td>
+      <td>60.0</td>
+      <td>40.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <td><a href="../../contest/1/user/49/edit">stu049</a></td>
+      <td>Kanya Rattana</td>
+        <td><a href="../../team/4">Team KKN01</a></td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+<script>
+  $(document).ready(function() {
+    CMS.AWSUtils.init_table_sort($("#ranking-table"), true, -1);
+  })
+</script>
+      </div>
+
+    </div>
+  </body>
+</html>

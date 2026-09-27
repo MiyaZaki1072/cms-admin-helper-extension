@@ -1,0 +1,54 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  font-size: 15px;
+}
+
+main {
+  max-width: 40rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+input[type='text'] {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  font: inherit;
+}
+
+button {
+  padding: 0.4rem 1rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.status {
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+}
+
+.status.ok {
+  background: #e6f4ea;
+  color: #1e4620;
+}
+
+.status.warn {
+  background: #fff4e5;
+  color: #663c00;
+}
+
+.status.error {
+  background: #fdecea;
+  color: #611a15;
+}

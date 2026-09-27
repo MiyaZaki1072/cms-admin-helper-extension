@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="../../../../static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../../../../static/reset.css">
+    <link rel="stylesheet" type="text/css" href="../../../../static/aws_style.css">
+    <script src="../../../../static/web_rpc.js"></script>
+    <script src="../../../../static/aws_utils.js"></script>
+    <script src="../../../../static/jq/jquery-3.6.0.min.js"></script>
+    <script src="../../../../static/jq/jquery.jqplot.min.js"></script>
+    <script src="../../../../static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="../../../../static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="../../../../static/sh/shCore.js"></script>
+    <script src="../../../../static/sh/shBrushCpp.js"></script>
+    <script src="../../../../static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../static/sh/shThemeDefault.css"/>
+
+    <title>Admin: Test Contest</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils("../../../..", 1790497341.791727,
+        1790489797.0, 1790507797.0,
+        1893456000.0, 1893456000.0,
+        0);
+
+    utils.update_remaining_time();
+    var timer = setInterval(function() { utils.update_remaining_time(timer); }, 1000);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+}
+
+function question_reply_toggle(element, invoker)
+{
+  var obj = document.getElementsByClassName("reply_question")[element];
+  if (obj.style.display != "block")
+    {
+      obj.style.display = "block";
+      invoker.innerHTML = "Hide reply";
+    }
+  else
+    {
+      obj.style.display = "none";
+      invoker.innerHTML = "Reply";
+    }
+  return false;
+}
+
+function update_additional_answer(element, invoker)
+{
+  var obj = document.getElementsByClassName("alternative_answer")[element];
+  if (invoker.selectedIndex == 5)
+    obj.style.display = "block";
+  else
+    obj.style.display = "none";
+}
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="../../../../admins">admin</a>.
+              <form class="inline" action="../../../../logout" method="POST"><input type="hidden" name="_xsrf" value="2|9aa80f7f|47af671e17ca1389387fb3ba3133a557|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent"><a href="../../../..">Administration</a></h1>
+          <h1 class="child">test</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          66281bc790651fd92669cb087b2eddfd
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href="../../../../contest/1/overview">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="../../../../contest/1/resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+          <ul class="menu">
+            <li class="menu_entry"><a class="menu_link" href="../../../../contest/1">General</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../../../contest/1/ranking">Ranking</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../../../contest/1/submissions">Submissions</a></li>
+<li class="menu_entry"><a class="menu_link" href="../../../../contest/1/user_tests">User tests</a></li>            <li class="menu_entry"><a class="menu_link" href="../../../../contest/1/users">Users</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../../../contest/1/tasks">Tasks</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../../../contest/1/announcements">Announcements</a></li>
+            <li class="menu_entry">
+              <span id="unanswered_questions" class="unread"
+>
+                2
+              </span>
+              <a class="menu_link" href="../../../../contest/1/questions">Questions</a>
+            </li>
+          </ul>
+          <div class="hr"></div>
+          <div class="footer">
+            <span id="remaining_text"></span>
+            <span id="remaining_value"></span>
+          </div>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+<h1>
+  Participation of <a href="../../../../user/50">stu050</a> in <a href="../../../../contest/1">test</a>
+</h1>
+
+<h2 id="title_submissions" class="toggling_on">Submissions</h2>
+<div id="submissions">
+  <p>
+    Reevaluate all 0 submissions for this user in this contest (for all datasets)
+    <button onclick="cmsrpc_request(
+                 'EvaluationService', 0,
+                 'invalidate_submission', {
+                 'participation_id': 50,
+                  'level': 'compilation'},
+                 function(response) { utils.redirect_if_ok('../../../../contest/1/user/50/edit', response); }
+                 );"
+        title="Compilation" >C</button>
+<button onclick="cmsrpc_request(
+                 'EvaluationService', 0,
+                 'invalidate_submission', {
+                 'participation_id': 50,
+                  'level': 'evaluation'},
+                 function(response) { utils.redirect_if_ok('../../../../contest/1/user/50/edit', response); }
+                  );"
+        title="Evaluation" >E</button>
+<button onclick="cmsrpc_request(
+                 'ScoringService', 0,
+                 'invalidate_submission', {
+                 'participation_id': 50,
+                 },
+                 function(response) { utils.redirect_if_ok('../../../../contest/1/user/50/edit', response); }
+                 );"
+        title="Score" >S</button>
+
+  </p>
+
+  <p>No submissions found.</p>
+
+
+
+  <div class="hr"></div>
+</div>
+
+
+<h2 id="title_participation_info" class="toggling_on">Participation information</h2>
+<div id="participation_info">
+  <!-- We use "multipart/form-data" to have Tornado distinguish between missing and empty values. -->
+  <form enctype="multipart/form-data" action="../../../../contest/1/user/50/edit" method="POST">
+    <input type="hidden" name="_xsrf" value="2|9aa80f7f|47af671e17ca1389387fb3ba3133a557|1790497340"/>
+    <table>
+      <tr>
+        <td>
+          <span class="info" title="Code of the team of the contestant in this contest. Only used in the external ranking."></span>
+          Team
+        </td>
+        <td>
+          <input list="teams" name="team" value="HDY01"/>
+          <datalist id="teams">
+            <option value="BKK01">
+            <option value="BKK02">
+            <option value="CNX01">
+            <option value="KKN01">
+            <option value="HDY01">
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="info" title="Contestant password for this contest. If empty, the contestant's main password is used.
+                                     Caution: stored in plain text."></span>
+          Password
+        </td>
+        <td>
+
+
+<input type="text" name="password" value="" />
+<select name="method">
+  <option value="plaintext" >Plain text</option>
+  <option value="bcrypt" selected>Hashed (bcrypt)</option>
+</select>
+<script>
+  $("[name=method]").change(function (e) {
+    if (e.target.value != "bcrypt") {
+      $("[name=password]").attr("placeholder", "");
+    }
+    else {
+      $("[name=password]").attr("placeholder", "The password is hashed, type a new one in here to change it");
+    }});
+  $("[name=method]").change();
+</script>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="info" title="Whether the contestant's results will be visible in the external ranking."></span>
+          Hidden participation
+        </td>
+        <td><input type="checkbox" name="hidden" checked/></td>
+      </tr>
+      <tr>
+        <td>
+          <span class="info" title="Whether the contestant is unrestricted by maximum number of submissions, user tests,
+                                    and minimum interval between submissions, user tests, and contest time."></span>
+          Unrestricted participation
+        </td>
+        <td><input type="checkbox" name="unrestricted" checked/></td>
+      </tr>
+      <tr>
+        <td>
+          <span class="info" title="A comma-separated list of IP addresses (or subnets) of the contestant for this contest.
+                                    Used for IP-based login restrictions and/or for autologin (in this case, it must be a single address)."></span>
+          IP address or subnet
+        </td>
+        <td><input type="text" name="ip" value="10.0.0.50/32, 192.168.1.0/24"/></td>
+      </tr>
+      <tr>
+        <td>
+          <span class="info" title="Time of first login during this contest, used for USACO-style contests.
+                                    Example: '2015-12-31 15:00:00'."></span>
+          Time of first login (in UTC)
+        </td>
+        <td><input type="text" name="starting_time" value="2026-09-27 07:19:51.248675"></td>
+      </tr>
+      <tr>
+        <td>
+          <span class="info" title="To be set (in seconds) to acknowledge that the contestant lost that amount of time at the beginning of the contest.
+                                    If this is non-zero, all the events (token generation, end of contest) for this contestant will be shifted of the appropriate amount."></span>
+          Delay
+        </td>
+        <td><input type="text" name="delay_time" value="300"></td>
+      </tr>
+      <tr>
+        <td>
+          <span class="info" title="To be set (in seconds) to acknowledge that the contestant lost that amount of time during the contest.
+                                    If this is non-zero, the end of the contest will be shifted of the appropriate amount for this contestant."></span>
+          Extra time
+        </td>
+        <td><input type="text" name="extra_time" value="600"></td>
+      </tr>
+    </table>
+    <input type="submit" value="Update" />
+    <input type="reset" value="Reset" />
+  </form>
+  <div class="hr"></div>
+</div>
+
+
+<h2 id="title_questions" class="toggling_on">Questions</h2>
+<div id="questions">
+  No questions.
+
+  <div class="hr"></div>
+</div>
+
+
+<h2 id="title_messages" class="toggling_on">Messages</h2>
+<div id="messages">
+
+  <div class="notifications">
+      <div class="notification communication">
+        <form id="send_message_form" action="../../../../contest/1/user/50/message" method="POST">
+          <input type="hidden" name="_xsrf" value="2|9aa80f7f|47af671e17ca1389387fb3ba3133a557|1790497340"/>
+          <div class="notification_msg">
+            <div class="notification_subject">
+              Subject:
+              <input id="send_message_subject" type="text" name="message_subject" style="width: 100%" />
+            </div>
+            <div class="notification_text">
+              Text:
+              <textarea name="message_text" style="width: 100%" ></textarea>
+            </div>
+          <input type="submit" value="Send"/>
+          </div>
+        </form>
+      </div>
+
+      No messages.
+  </div>
+  <div class="hr"></div>
+</div>
+
+
+      </div>
+
+    </div>
+  </body>
+</html>

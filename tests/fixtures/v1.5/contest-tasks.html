@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="../../static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../../static/reset.css">
+    <link rel="stylesheet" type="text/css" href="../../static/aws_style.css">
+    <script src="../../static/web_rpc.js"></script>
+    <script src="../../static/aws_utils.js"></script>
+    <script src="../../static/jq/jquery-3.6.0.min.js"></script>
+    <script src="../../static/jq/jquery.jqplot.min.js"></script>
+    <script src="../../static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="../../static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="../../static/sh/shCore.js"></script>
+    <script src="../../static/sh/shBrushCpp.js"></script>
+    <script src="../../static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/sh/shThemeDefault.css"/>
+
+    <title>Admin: Test Contest</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils("../..", 1790497341.199731,
+        1790489797.0, 1790507797.0,
+        1893456000.0, 1893456000.0,
+        0);
+
+    utils.update_remaining_time();
+    var timer = setInterval(function() { utils.update_remaining_time(timer); }, 1000);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+}
+
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="../../admins">admin</a>.
+              <form class="inline" action="../../logout" method="POST"><input type="hidden" name="_xsrf" value="2|c35d437d|1e5a2b1c4e3f5f8b618affb868c6e955|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent"><a href="../..">Administration</a></h1>
+          <h1 class="child">test</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          6511f4844d2a4b80a48926851df110a1
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href="../../contest/1/overview">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="../../contest/1/resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+          <ul class="menu">
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1">General</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/ranking">Ranking</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/submissions">Submissions</a></li>
+<li class="menu_entry"><a class="menu_link" href="../../contest/1/user_tests">User tests</a></li>            <li class="menu_entry"><a class="menu_link" href="../../contest/1/users">Users</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/tasks">Tasks</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../../contest/1/announcements">Announcements</a></li>
+            <li class="menu_entry">
+              <span id="unanswered_questions" class="unread"
+>
+                2
+              </span>
+              <a class="menu_link" href="../../contest/1/questions">Questions</a>
+            </li>
+          </ul>
+          <div class="hr"></div>
+          <div class="footer">
+            <span id="remaining_text"></span>
+            <span id="remaining_value"></span>
+          </div>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+<div class="core_title">
+  <h1>Tasks list of <a href="../../contest/1">test</a></h1>
+</div>
+
+<form action="../../contest/1/tasks/add" method="POST">
+  <input type="hidden" name="_xsrf" value="2|c35d437d|1e5a2b1c4e3f5f8b618affb868c6e955|1790497340"/>
+  Add a new task:
+  <select name="task_id">
+    <option value="null" selected>Select a new task</option>
+  </select>
+  <input type="submit"
+         value="Add task" />
+</form>
+
+<form action="../../contest/1/tasks" method="POST">
+  <input type="hidden" name="_xsrf" value="2|c35d437d|1e5a2b1c4e3f5f8b618affb868c6e955|1790497340"/>
+  Remove selected task from the contest:
+  <input type="submit" name="operation"
+         value="Remove from contest" />
+
+  <br>
+
+  Move selected task:
+  <input type="submit" name="operation"
+         value="to the top" />
+  <input type="submit" name="operation"
+         value="up by 1" />
+  <input type="submit" name="operation"
+         value="down by 1" />
+  <input type="submit" name="operation"
+         value="to the bottom" />
+  <table class="bordered">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <input type="radio" name="task_id" value="1"/>
+        </td>
+        <td><a href="../../task/1">sum</a></td>
+        <td>A plus B</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="task_id" value="2"/>
+        </td>
+        <td><a href="../../task/2">max</a></td>
+        <td>Largest Number</td>
+      </tr>
+    </tbody>
+  </table>
+</form>
+      </div>
+
+    </div>
+  </body>
+</html>

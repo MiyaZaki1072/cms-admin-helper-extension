@@ -20,8 +20,11 @@ A local CMS v1.5 with seeded test data, used to develop and test the extension.
 From the repo root:
 
 ```bash
-git clone --depth 1 --branch v1.5 https://github.com/cms-dev/cms.git cms-server
+git clone --depth 1 --branch v1.5 --recurse-submodules --shallow-submodules \
+  -c core.autocrlf=false https://github.com/cms-dev/cms.git cms-server
 ```
+
+`--recurse-submodules` fetches `isolate` (the sandbox), which the Docker build compiles. `core.autocrlf=false` keeps LF line endings so the scripts run inside the Linux container.
 
 `cms-server/` is gitignored. Its `docker-compose.dev.yml` runs Postgres (`devdb`) and a CMS container (`devcms`) with ports 8888, 8889 and 8890. The database is stored in `cms-server/.dev/postgres-data`.
 
@@ -43,6 +46,10 @@ The first run builds the CMS Docker image, which takes about 10–15 minutes. Th
    - 50 users (`stu001`–`stu050`, timezone Asia/Bangkok) in the contest, 10 per team.
    - 300 submissions spread across 48 users. `stu049` and `stu050` never submit. The data is the same on every run (random seed 42).
    - A read-only admin `viewer` (no *all* or *messaging* permission). `cmsAddAdmin` can only create full admins, so the script adds this one directly.
+5. Runs [`scripts/seed/seed_extras.py`](../scripts/seed/seed_extras.py), which adds what the tests and HTML fixtures need:
+   questions (one answered, one with HTML in it), an announcement, a private message, a user outside the contest (`guest01`),
+   a participation with every field set (`stu050`), a contest-only plaintext password (`stu049`), and two empty contests,
+   `practice` and `practice2`, that the bulk-import tests write to.
 
 Submissions use the sample solutions in [`scripts/seed/solutions/`](../scripts/seed/solutions/), which cover every outcome:
 
@@ -93,4 +100,5 @@ scripts/seed.sh
 
 - **Submissions stay in *Evaluating…*:** the worker uses `isolate`, which needs cgroups. On Docker Desktop, check that the WSL 2 backend is on. The worker logs are in `cms-server/.dev/home/log/`.
 - **`scripts/*.sh: bad interpreter` or `\r` errors:** the files have CRLF line endings. `.gitattributes` forces LF; run `git add --renormalize .` and check out again.
+- **Build fails at `make -C isolate isolate`:** the `isolate` submodule is empty. Run `git -C cms-server submodule update --init --depth 1`.
 - **Port already in use:** stop any other container that uses 8888, 8889 or 8890.

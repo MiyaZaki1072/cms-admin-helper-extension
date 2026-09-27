@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="./static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./static/reset.css">
+    <link rel="stylesheet" type="text/css" href="./static/aws_style.css">
+    <script src="./static/web_rpc.js"></script>
+    <script src="./static/aws_utils.js"></script>
+    <script src="./static/jq/jquery-3.6.0.min.js"></script>
+    <script src="./static/jq/jquery.jqplot.min.js"></script>
+    <script src="./static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="./static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="./static/sh/shCore.js"></script>
+    <script src="./static/sh/shBrushCpp.js"></script>
+    <script src="./static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="./static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="./static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="./static/sh/shThemeDefault.css"/>
+
+    <title>Admin</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils(".", 1790497340.963638, 0, 0, 0, 0, -1);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+
+setInterval(update_statuses, 5000);
+update_statuses();
+
+}
+
+
+function update_submissions_status(response)
+{
+    var table = $("#submissions_status_table > tbody");
+    var msg = utils.standard_response(response);
+    if (msg != "")
+    {
+        table.html('<tr><td style="text-align: center;" colspan="2">'+ msg + '</td></tr>');
+        return;
+    }
+
+    var strings = []
+    strings.push('<tr><td>Scored</td><td>' + response['data']['scored'] + '</td></tr>');
+    if (response['data']['scoring'] != 0)
+        strings.push('<tr><td>Scoring...</td><td>' + response['data']['scoring'] + '</td></tr>');
+    if (response['data']['compilation_fail'] != 0)
+        strings.push('<tr><td>Compilation failed</td><td>' + response['data']['compilation_fail'] + '</td></tr>');
+    if (response['data']['compiling'] != 0)
+        strings.push('<tr><td>Compiling...</td><td>' + response['data']['compiling'] + '</td></tr>');
+    if (response['data']['evaluating'] != 0)
+        strings.push('<tr><td>Evaluating...</td><td>' + response['data']['evaluating'] + '</td></tr>');
+    if (response['data']['max_compilations'] != 0)
+        strings.push('<tr><td>Cannot compile (please check)</td><td>' + response['data']['max_compilations'] + '</td></tr>');
+    if (response['data']['max_evaluations'] != 0)
+        strings.push('<tr><td>Cannot evaluate (please check)</td><td>' + response['data']['max_evaluations'] + '</td></tr>');
+
+    table.html(strings.join(""));
+};
+
+function update_queue_status(response)
+{
+    var table = $("#queue_status_table > tbody");
+    var msg = utils.standard_response(response);
+    if (msg != "")
+    {
+        table.html('<tr><td style="text-align: center;" colspan="4">'+ msg + '</td></tr>');
+        return;
+    }
+
+    var l = response['data'].length;
+    if (l == 0)
+    {
+        table.html('<tr><td colspan="100">Queue empty.</td></tr>');
+        return;
+    }
+
+    var strings = [];
+    for (var i = 0; i < l; i++)
+    {
+        var job = utils.repr_job(response['data'][i]['item']);
+        var date = utils.repr_time_ago(response['data'][i]['timestamp']);
+        strings.push('<tr><td style="text-align: center;">' + (i + 1) + '</td>');
+        strings.push('<td>' + job + '</td>');
+        strings.push('<td style="text-align: center;">' + response['data'][i]['priority'] + '</td>');
+        strings.push('<td>' + date + '</td></tr>');
+    }
+
+    table.html(strings.join(""));
+};
+
+function enable_worker(shard) {
+    if (confirm("Do you really want to enable worker " + shard + "?")) {
+        cmsrpc_request("EvaluationService", 0,
+                       "enable_worker",
+                       {"shard":shard},
+                       function() {
+                          cmsrpc_request("EvaluationService", 0,
+                                         "workers_status",
+                                         {},
+                                         update_workers_status);
+                       });
+    }
+}
+
+function disable_worker(shard) {
+    if (confirm("Do you really want to disable worker " + shard + "?")) {
+        cmsrpc_request("EvaluationService", 0,
+                       "disable_worker",
+                       {"shard":shard},
+                       function() {
+                          cmsrpc_request("EvaluationService", 0,
+                                         "workers_status",
+                                         {},
+                                         update_workers_status);
+                       });
+    }
+}
+
+function update_workers_status(response)
+{
+    var table = $("#workers_status_table > tbody");
+    var msg = utils.standard_response(response);
+    if (msg != "")
+    {
+        table.html('<tr><td style="text-align: center;" colspan="5">'+ msg + '</td></tr>');
+        return;
+    }
+
+    var l = response['data'].length;
+    if (l == 0)
+    {
+        table.html('<tr><td colspan="5">No workers found.</td>');
+        return;
+    }
+
+    var strings = [];
+    for (var i in response['data'])
+    {
+        var job = "";
+        if ($.isArray(response['data'][i]['operations'])) {
+            job = utils.repr_job(response['data'][i]['operations'][0]);
+            if (response['data'][i]['operations'].length > 1) {
+                job += ' and ' + (response['data'][i]['operations'].length - 1) + ' more';
+            }
+        } else {
+            job = utils.repr_job(response['data'][i]['operations']);
+        }
+        var start_time = utils.repr_time_ago(response['data'][i]['start_time']);
+        var connected = "Yes";
+        if (response['data'][i]['connected'] == false)
+            connected = "No";
+        strings.push('<tr><td style="text-align: center;">' + i + '</td>');
+        strings.push('<td style="text-align: center;">' + connected + '</td>');
+        strings.push('<td>' + job + '</td>');
+        strings.push('<td>' + start_time + '</td>');
+        if (response['data'][i]['operations'] == "disabled") {
+            strings.push('<td><button onclick="javascript:enable_worker(' + i + '); return true;"' +
+                         '>Enable</button></td>');
+        } else {
+            strings.push('<td><button onclick="javascript:disable_worker(' + i + '); return true;"' +
+                         '>Disable</button></td>');
+        }
+        strings.push('</tr>');
+    }
+
+    table.html(strings.join(""));
+};
+
+function link_submissions(s)
+{
+    return s.replace(/submission ([0-9]+)/g,
+                     function (match, n, offset, string) {
+                         return 'submission <a href="' + utils.url("submission", n) + '">' + n + '</a>';
+                     });
+}
+
+function escape_html(s)
+{
+    return $("<div>").text(s).html();
+}
+
+function update_logs(response)
+{
+    var table = $("#logs_table > tbody");
+    var msg = utils.standard_response(response);
+    if (msg != "")
+    {
+        table.html('<tr><td style="text-align: center;" colspan="5">'+ msg + '</td></tr>');
+        return;
+    }
+
+    var l = response['data'].length;
+    if (l == 0)
+    {
+        table.html('<tr><td colspan="5">No log entries.</td>');
+        return;
+    }
+
+    var new_table = $('<tbody>');
+    response['data'] = response['data'].reverse();
+    for (i in response['data'])
+    {
+        var message = link_submissions(escape_html(response['data'][i]['message']));
+        var coord = response['data'][i]['coord'];
+        var operation = link_submissions(escape_html(response['data'][i]['operation']));
+        var severity = response['data'][i]['severity'];
+        var timestamp = utils.format_time_or_date(response['data'][i]['timestamp']);
+
+        var row = $('<tr>');
+        row.append($('<td>').text(timestamp));
+        row.append($('<td>').text(severity));
+        row.append($('<td>').text(coord));
+        // We inject it as HTML rather than text because we escaped it before
+        // and because we need to preserve the links to the submission pages.
+        row.append($('<td>').html(operation));
+        row.append($('<td>').append($('<pre>').html(message)));
+        new_table.append(row);
+    }
+    table.replaceWith(new_table);
+}
+
+function update_statuses()
+{
+
+    if (!update_statuses.queue_request
+            || update_statuses.queue_request.state() != "pending") {
+        update_statuses.queue_request =
+            cmsrpc_request("EvaluationService", 0,
+                           "queue_status",
+                           {},
+                           update_queue_status);
+    }
+    cmsrpc_request("EvaluationService", 0,
+                   "workers_status",
+                   {},
+                   update_workers_status);
+    cmsrpc_request("LogService", 0,
+                   "last_messages",
+                   {},
+                   update_logs);
+}
+
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="./admins">admin</a>.
+              <form class="inline" action="./logout" method="POST"><input type="hidden" name="_xsrf" value="2|55fc5889|88fb30e8d89e447ff72be44cfe67f2a1|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent">Administration</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          19719064b9db2c7ce81667809d7f720c
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href=".">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="./resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+        <h1><a class="menu_link" href="./contests">Contests</a></h1>
+        <ul class="menu">
+
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./contest/1" title="Test Contest">
+              test
+            </a>
+          </li>
+
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./contests/add">
+              (create new contest...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./tasks">Tasks</a></h1>
+        <ul class="menu">
+
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./task/1" title="A plus B">
+              sum
+            </a>
+          </li>
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./task/2" title="Largest Number">
+              max
+            </a>
+          </li>
+
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./tasks/add">
+              (create new task...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./users">Users</a></h1>
+        <ul class="menu">
+            <li>
+              <a class="menu_link" href="./users">
+                  (show the 51 users...)
+              </a>
+            </li>
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./users/add">
+              (create new user...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./teams">Teams</a></h1>
+        <ul class="menu">
+            <li>
+              <a class="menu_link" href="./teams">
+                  (show the 5 teams...)
+              </a>
+            </li>
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./teams/add">
+              (create new team...)
+            </a>
+          </li>
+        </ul>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+
+<h1>Overview</h1>
+<span id="update_time"></span>
+
+
+<h2 id="title_queue_status" class="toggling_on">Queue status</h2>
+<div id="queue_status">
+  <table id="queue_status_table" class="sub_table">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Job</th>
+        <th>Priority</th>
+        <th>Since</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align: center;" colspan="4"><img src="./static/loading.gif" alt="loading..." /></td></tr>
+    </tbody>
+  </table>
+  <div class="hr"></div>
+</div>
+
+<h2 id="title_workers_status" class="toggling_on">Workers status</h2>
+<div id="workers_status">
+  <table id="workers_status_table" class="sub_table">
+    <thead>
+      <tr>
+        <th style="width:5%">Shard</th>
+        <th style="width:15%">Connected</th>
+        <th style="width:50%">Current job</th>
+        <th style="width:20%">Since</th>
+        <th style="width:10%">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align: center;" colspan="5"><img src="./static/loading.gif" alt="loading..." /></td></tr>
+    </tbody>
+  </table>
+  <div class="hr"></div>
+</div>
+
+<h2 id="title_logs" class="toggling_on">Logs</h2>
+<div id="logs">
+
+  <table id="logs_table" class="sub_table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Severity</th>
+        <th>Service</th>
+        <th>Operation</th>
+        <th>Message</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align: center;" colspan="5"><img src="./static/loading.gif" alt="loading..." /></td></tr>
+    </tbody>
+  </table>
+  <div class="hr"></div>
+</div>
+      </div>
+
+    </div>
+  </body>
+</html>

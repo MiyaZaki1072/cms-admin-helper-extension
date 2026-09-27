@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="./static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./static/reset.css">
+    <link rel="stylesheet" type="text/css" href="./static/aws_style.css">
+    <title>Admin</title>
+  </head>
+  <body class="admin">
+    <div id="login-content">
+
+<h1>Welcome</h1>
+<p>Please log in:</p>
+<form action="./login" method="POST">
+  <input type="hidden" name="_xsrf" value="2|dbe70fe6|e5ce7db68cb0469177c2d0893ae74f3c|1790497339"/>
+  <div class="section">
+    <label>
+      <span>Username</span>
+      <input type="text" name="username">
+    </label>
+  </div>
+  <div class="section">
+    <label class="control-label">
+      <span>Password</span>
+      <input type="password" name="password" autocomplete="current-password">
+    </label>
+  </div>
+  <div class="section">
+    <button type="submit">Login</button>
+    <button type="reset">Reset</button>
+  </div>
+</form>
+
+    </div>
+  </body>
+</html>

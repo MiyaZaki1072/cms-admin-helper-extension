@@ -1,0 +1,439 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="../static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../static/reset.css">
+    <link rel="stylesheet" type="text/css" href="../static/aws_style.css">
+    <script src="../static/web_rpc.js"></script>
+    <script src="../static/aws_utils.js"></script>
+    <script src="../static/jq/jquery-3.6.0.min.js"></script>
+    <script src="../static/jq/jquery.jqplot.min.js"></script>
+    <script src="../static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="../static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="../static/sh/shCore.js"></script>
+    <script src="../static/sh/shBrushCpp.js"></script>
+    <script src="../static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/sh/shThemeDefault.css"/>
+
+    <title>Admin: Test Contest</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils("..", 1790497341.829186,
+        1790489797.0, 1790507797.0,
+        1893456000.0, 1893456000.0,
+        0);
+
+    utils.update_remaining_time();
+    var timer = setInterval(function() { utils.update_remaining_time(timer); }, 1000);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+}
+
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="../admins">admin</a>.
+              <form class="inline" action="../logout" method="POST"><input type="hidden" name="_xsrf" value="2|fb78a4c7|267fcca6761ab83159af180250e30eef|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent"><a href="..">Administration</a></h1>
+          <h1 class="child">test</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          acdc10e2d5c97bf3e08e8acba30570fc
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href="../contest/1/overview">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="../contest/1/resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+          <ul class="menu">
+            <li class="menu_entry"><a class="menu_link" href="../contest/1">General</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../contest/1/ranking">Ranking</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../contest/1/submissions">Submissions</a></li>
+<li class="menu_entry"><a class="menu_link" href="../contest/1/user_tests">User tests</a></li>            <li class="menu_entry"><a class="menu_link" href="../contest/1/users">Users</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../contest/1/tasks">Tasks</a></li>
+            <li class="menu_entry"><a class="menu_link" href="../contest/1/announcements">Announcements</a></li>
+            <li class="menu_entry">
+              <span id="unanswered_questions" class="unread"
+>
+                2
+              </span>
+              <a class="menu_link" href="../contest/1/questions">Questions</a>
+            </li>
+          </ul>
+          <div class="hr"></div>
+          <div class="footer">
+            <span id="remaining_text"></span>
+            <span id="remaining_value"></span>
+          </div>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+<div class="core_title">
+  <h1>Submission 300 (Task: <a href="../task/2">max</a>)</h1>
+</div>
+
+
+<h2 id="title_datasets" class="toggling_off">Dataset: Default (Live)</h2>
+<div id="datasets" style="display: none;">
+
+  <p>Current dataset: "<strong>Default</strong>".<br/>
+</div>
+
+<h2 id="title_details" class="toggling_on">Submission details</h2>
+<div id="details">
+
+  <table class="bordered">
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Submission time</td>
+        <td>2026-09-27 08:15:40</td>
+      </tr>
+      <tr>
+        <td>Id</td>
+        <td>300</td>
+      </tr>
+      <tr>
+        <td>Task</td>
+        <td><a href="../task/2">max</a></td>
+      </tr>
+      <tr>
+        <td>User</td>
+        <td><a href="../contest/1/user/15/edit">stu015</a></td>
+      </tr>
+      <tr>
+        <td>Files</td>
+        <td>
+          <a href="javascript:void(0);" onclick="utils.show_file('max.py','../submission_file/300')">
+            max.py
+          </a>
+          <br/>
+        </td>
+      </tr>
+      <tr>
+        <td>Language</td>
+        <td>
+          Python 3 / CPython
+      </tr>
+      <tr>
+        <td>Token</td>
+        <td>
+          No
+        </td>
+      </tr>
+      <tr>
+        <td>Official</td>
+        <td>
+            <form action="../submission/300/2/official" name="official_status_form" method="POST">
+            <input type="hidden" name="_xsrf" value="2|fb78a4c7|267fcca6761ab83159af180250e30eef|1790497340"/>
+              <input type="hidden" name="official" value="no"/>
+              Yes
+              <input
+               type="submit" value="Make unofficial" />
+            </form>
+        </td>
+      </tr>
+      <tr>
+        <td>Status</td>
+        <td id="submission_status">
+          Scored (100.0 / 100.0)
+        </td>
+      </tr>
+      <tr>
+        <td>Score as seen by user</td>
+        <td>
+            0 / 0
+        </td>
+      </tr>
+      <tr>
+        <td>Failures during compilation</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>Compilation shard</td>
+        <td>5</td>
+      </tr>
+      <tr>
+        <td>Compilation sandbox</td>
+        <td>/tmp/cms-compile-3wpa9en8</td>
+      </tr>
+      <tr>
+        <td>Failures during evaluation</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>Max execution time</td>
+        <td>0.072 s</td>
+      </tr>
+      <tr>
+        <td>Max memory used</td>
+        <td>3 MiB</td>
+      </tr>
+      <tr>
+        <td>Reevaluate</td>
+        <td>
+          <button onclick="cmsrpc_request(
+                 'EvaluationService', 0,
+                 'invalidate_submission', {
+                 'submission_id': 300,
+                 'dataset_id': 2,
+                  'level': 'compilation'},
+                 function(response) { utils.redirect_if_ok('../submission/300/2', response); }
+                 );"
+        title="Compilation" >C</button>
+<button onclick="cmsrpc_request(
+                 'EvaluationService', 0,
+                 'invalidate_submission', {
+                 'submission_id': 300,
+                 'dataset_id': 2,
+                  'level': 'evaluation'},
+                 function(response) { utils.redirect_if_ok('../submission/300/2', response); }
+                  );"
+        title="Evaluation" >E</button>
+<button onclick="cmsrpc_request(
+                 'ScoringService', 0,
+                 'invalidate_submission', {
+                 'submission_id': 300,
+                 'dataset_id': 2,
+                 },
+                 function(response) { utils.redirect_if_ok('../submission/300/2', response); }
+                 );"
+        title="Score" >S</button>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<h2 id="title_comment" class="toggling_on">Comment</h2>
+
+<div id="comment">
+  <form enctype="multipart/form-data" action="../submission/300/2/comment" method="POST">
+    <input type="hidden" name="_xsrf" value="2|fb78a4c7|267fcca6761ab83159af180250e30eef|1790497340"/>
+    <textarea name="comment" cols="40" rows="3"></textarea><br/>
+    <input
+       type="submit"/>
+    <input type="reset" value="Reset" />
+  </form>
+</div>
+
+
+<h2 id="title_evaluation_user" class="toggling_on">Evaluation (as seen by the user)</h2>
+<div id="evaluation_user">
+
+  <div class="score_details" id="evaluation_300">
+      <table class="testcase-list">
+    <thead>
+        <tr>
+            <th class="idx">
+#            </th>
+            <th class="outcome">
+Outcome            </th>
+            <th class="details">
+Details            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="undefined">
+            <td colspan="5">
+N/A            </td>
+        </tr>
+        <tr class="undefined">
+            <td colspan="5">
+N/A            </td>
+        </tr>
+        <tr class="undefined">
+            <td colspan="5">
+N/A            </td>
+        </tr>
+        <tr class="undefined">
+            <td colspan="5">
+N/A            </td>
+        </tr>
+        <tr class="undefined">
+            <td colspan="5">
+N/A            </td>
+        </tr>
+    </tbody>
+</table>
+  </div>
+</div>
+
+
+
+<h2 id="title_evaluation_admin" class="toggling_on">Evaluation (as seen by the admin)</h2>
+<div id="evaluation_admin">
+
+  <table class="bordered">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Codename</th>
+        <th>Outcome</th>
+        <th>Visible</th>
+        <th>Details</th>
+        <th>Shard</th>
+        <th>Resources</th>
+        <th>Sandbox</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>1</td>
+          <td>000</td>
+          <td id="eval_outcome_000">1.0</td>
+          <td style="text-align: center">
+            <input type="checkbox" disabled>
+          </td>
+          <td id="eval_text_000">Output is correct</td>
+          <td>3</td>
+          <td>
+            (0.067 s)
+            (0.076 s)
+            (3 MiB)
+          </td>
+          <td>/tmp/cms-evaluate-fah__rnn</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>001</td>
+          <td id="eval_outcome_001">1.0</td>
+          <td style="text-align: center">
+            <input type="checkbox" disabled>
+          </td>
+          <td id="eval_text_001">Output is correct</td>
+          <td>9</td>
+          <td>
+            (0.048 s)
+            (0.085 s)
+            (3 MiB)
+          </td>
+          <td>/tmp/cms-evaluate-u8y08cdy</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>002</td>
+          <td id="eval_outcome_002">1.0</td>
+          <td style="text-align: center">
+            <input type="checkbox" disabled>
+          </td>
+          <td id="eval_text_002">Output is correct</td>
+          <td>13</td>
+          <td>
+            (0.072 s)
+            (0.075 s)
+            (3 MiB)
+          </td>
+          <td>/tmp/cms-evaluate-99fiee3k</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>003</td>
+          <td id="eval_outcome_003">1.0</td>
+          <td style="text-align: center">
+            <input type="checkbox" disabled>
+          </td>
+          <td id="eval_text_003">Output is correct</td>
+          <td>7</td>
+          <td>
+            (0.049 s)
+            (0.05 s)
+            (3 MiB)
+          </td>
+          <td>/tmp/cms-evaluate-vd39fiok</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>004</td>
+          <td id="eval_outcome_004">1.0</td>
+          <td style="text-align: center">
+            <input type="checkbox" disabled>
+          </td>
+          <td id="eval_text_004">Output is correct</td>
+          <td>8</td>
+          <td>
+            (0.045 s)
+            (0.045 s)
+            (3 MiB)
+          </td>
+          <td>/tmp/cms-evaluate-s6uagdut</td>
+        </tr>
+    </tbody>
+  </table>
+
+</div>
+
+
+
+
+<h2 id="title_compilation" class="toggling_on">Compilation</h2>
+<div id="compilation">
+
+  <h3>Outcome</h3>
+  <pre>Compilation succeeded</pre>
+
+  <h3>Standard output</h3>
+  <pre>Listing &#39;.&#39;...
+Compiling &#39;./max.py&#39;...
+===
+
+===
+</pre>
+
+  <h3>Standard error</h3>
+  <pre>
+===
+
+===
+</pre>
+
+</div>
+
+
+      </div>
+
+    </div>
+  </body>
+</html>

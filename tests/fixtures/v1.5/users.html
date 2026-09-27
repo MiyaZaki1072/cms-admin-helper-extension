@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="./static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./static/reset.css">
+    <link rel="stylesheet" type="text/css" href="./static/aws_style.css">
+    <script src="./static/web_rpc.js"></script>
+    <script src="./static/aws_utils.js"></script>
+    <script src="./static/jq/jquery-3.6.0.min.js"></script>
+    <script src="./static/jq/jquery.jqplot.min.js"></script>
+    <script src="./static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="./static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="./static/sh/shCore.js"></script>
+    <script src="./static/sh/shBrushCpp.js"></script>
+    <script src="./static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="./static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="./static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="./static/sh/shThemeDefault.css"/>
+
+    <title>Admin</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils(".", 1790497342.111481, 0, 0, 0, 0, -1);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+}
+
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="./admins">admin</a>.
+              <form class="inline" action="./logout" method="POST"><input type="hidden" name="_xsrf" value="2|9d7106ac|40766ecd10131a5a3fa6ba6936eaac84|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent">Administration</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          826b760db35452b6a8897a5df7f5e3e7
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href=".">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="./resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+        <h1><a class="menu_link" href="./contests">Contests</a></h1>
+        <ul class="menu">
+
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./contest/1" title="Test Contest">
+              test
+            </a>
+          </li>
+
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./contests/add">
+              (create new contest...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./tasks">Tasks</a></h1>
+        <ul class="menu">
+
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./task/1" title="A plus B">
+              sum
+            </a>
+          </li>
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./task/2" title="Largest Number">
+              max
+            </a>
+          </li>
+
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./tasks/add">
+              (create new task...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./users">Users</a></h1>
+        <ul class="menu">
+            <li>
+              <a class="menu_link" href="./users">
+                  (show the 51 users...)
+              </a>
+            </li>
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./users/add">
+              (create new user...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./teams">Teams</a></h1>
+        <ul class="menu">
+            <li>
+              <a class="menu_link" href="./teams">
+                  (show the 5 teams...)
+              </a>
+            </li>
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./teams/add">
+              (create new team...)
+            </a>
+          </li>
+        </ul>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+
+<div class="core_title">
+  <h1>Users list</h1>
+</div>
+
+<form action="./users" method="POST">
+  <input type="hidden" name="_xsrf" value="2|9d7106ac|40766ecd10131a5a3fa6ba6936eaac84|1790497340"/>
+  Edit selected user:
+   <input type="submit"
+         name="operation"
+         value="Remove"
+         />
+  <table class="bordered">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Username</th>
+        <th>First name</th>
+        <th>Last name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="51"/>
+        </td>
+        <td><a href="./user/51">guest01</a></td>
+        <td>Guest</td>
+        <td>Account</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="1"/>
+        </td>
+        <td><a href="./user/1">stu001</a></td>
+        <td>Arthit</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="2"/>
+        </td>
+        <td><a href="./user/2">stu002</a></td>
+        <td>Somchai</td>
+        <td>Wongsa</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="3"/>
+        </td>
+        <td><a href="./user/3">stu003</a></td>
+        <td>Kanya</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="4"/>
+        </td>
+        <td><a href="./user/4">stu004</a></td>
+        <td>Anan</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="5"/>
+        </td>
+        <td><a href="./user/5">stu005</a></td>
+        <td>Arthit</td>
+        <td>Thongdee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="6"/>
+        </td>
+        <td><a href="./user/6">stu006</a></td>
+        <td>Malee</td>
+        <td>Panya</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="7"/>
+        </td>
+        <td><a href="./user/7">stu007</a></td>
+        <td>Niran</td>
+        <td>Jaidee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="8"/>
+        </td>
+        <td><a href="./user/8">stu008</a></td>
+        <td>Somchai</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="9"/>
+        </td>
+        <td><a href="./user/9">stu009</a></td>
+        <td>Kanya</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="10"/>
+        </td>
+        <td><a href="./user/10">stu010</a></td>
+        <td>Wichai</td>
+        <td>Panya</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="11"/>
+        </td>
+        <td><a href="./user/11">stu011</a></td>
+        <td>Somchai</td>
+        <td>Thongdee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="12"/>
+        </td>
+        <td><a href="./user/12">stu012</a></td>
+        <td>Kanya</td>
+        <td>Thongdee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="13"/>
+        </td>
+        <td><a href="./user/13">stu013</a></td>
+        <td>Niran</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="14"/>
+        </td>
+        <td><a href="./user/14">stu014</a></td>
+        <td>Ploy</td>
+        <td>Panya</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="15"/>
+        </td>
+        <td><a href="./user/15">stu015</a></td>
+        <td>Prasert</td>
+        <td>Jaidee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="16"/>
+        </td>
+        <td><a href="./user/16">stu016</a></td>
+        <td>Chai</td>
+        <td>Chaiyaporn</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="17"/>
+        </td>
+        <td><a href="./user/17">stu017</a></td>
+        <td>Mali</td>
+        <td>Saetang</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="18"/>
+        </td>
+        <td><a href="./user/18">stu018</a></td>
+        <td>Suda</td>
+        <td>Wongsa</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="19"/>
+        </td>
+        <td><a href="./user/19">stu019</a></td>
+        <td>Anan</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="20"/>
+        </td>
+        <td><a href="./user/20">stu020</a></td>
+        <td>Chai</td>
+        <td>Rattana</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="21"/>
+        </td>
+        <td><a href="./user/21">stu021</a></td>
+        <td>Malee</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="22"/>
+        </td>
+        <td><a href="./user/22">stu022</a></td>
+        <td>Niran</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="23"/>
+        </td>
+        <td><a href="./user/23">stu023</a></td>
+        <td>Suda</td>
+        <td>Rattana</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="24"/>
+        </td>
+        <td><a href="./user/24">stu024</a></td>
+        <td>Nok</td>
+        <td>Wongsa</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="25"/>
+        </td>
+        <td><a href="./user/25">stu025</a></td>
+        <td>Chai</td>
+        <td>Jaidee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="26"/>
+        </td>
+        <td><a href="./user/26">stu026</a></td>
+        <td>Mali</td>
+        <td>Kongkaew</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="27"/>
+        </td>
+        <td><a href="./user/27">stu027</a></td>
+        <td>Wichai</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="28"/>
+        </td>
+        <td><a href="./user/28">stu028</a></td>
+        <td>Krit</td>
+        <td>Saetang</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="29"/>
+        </td>
+        <td><a href="./user/29">stu029</a></td>
+        <td>Malee</td>
+        <td>Thongdee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="30"/>
+        </td>
+        <td><a href="./user/30">stu030</a></td>
+        <td>Prasert</td>
+        <td>Panya</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="31"/>
+        </td>
+        <td><a href="./user/31">stu031</a></td>
+        <td>Krit</td>
+        <td>Rattana</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="32"/>
+        </td>
+        <td><a href="./user/32">stu032</a></td>
+        <td>Nok</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="33"/>
+        </td>
+        <td><a href="./user/33">stu033</a></td>
+        <td>Mali</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="34"/>
+        </td>
+        <td><a href="./user/34">stu034</a></td>
+        <td>Somchai</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="35"/>
+        </td>
+        <td><a href="./user/35">stu035</a></td>
+        <td>Chai</td>
+        <td>Wongsa</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="36"/>
+        </td>
+        <td><a href="./user/36">stu036</a></td>
+        <td>Malee</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="37"/>
+        </td>
+        <td><a href="./user/37">stu037</a></td>
+        <td>Fah</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="38"/>
+        </td>
+        <td><a href="./user/38">stu038</a></td>
+        <td>Niran</td>
+        <td>Wongsa</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="39"/>
+        </td>
+        <td><a href="./user/39">stu039</a></td>
+        <td>Ploy</td>
+        <td>Rattana</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="40"/>
+        </td>
+        <td><a href="./user/40">stu040</a></td>
+        <td>Anan</td>
+        <td>Rattana</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="41"/>
+        </td>
+        <td><a href="./user/41">stu041</a></td>
+        <td>Suda</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="42"/>
+        </td>
+        <td><a href="./user/42">stu042</a></td>
+        <td>Arthit</td>
+        <td>Wongsa</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="43"/>
+        </td>
+        <td><a href="./user/43">stu043</a></td>
+        <td>Mali</td>
+        <td>Srisuk</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="44"/>
+        </td>
+        <td><a href="./user/44">stu044</a></td>
+        <td>Nok</td>
+        <td>Chaiyaporn</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="45"/>
+        </td>
+        <td><a href="./user/45">stu045</a></td>
+        <td>Wichai</td>
+        <td>Boonmee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="46"/>
+        </td>
+        <td><a href="./user/46">stu046</a></td>
+        <td>Anan</td>
+        <td>Kongkaew</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="47"/>
+        </td>
+        <td><a href="./user/47">stu047</a></td>
+        <td>Niran</td>
+        <td>Wongsa</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="48"/>
+        </td>
+        <td><a href="./user/48">stu048</a></td>
+        <td>Krit</td>
+        <td>Thongdee</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="49"/>
+        </td>
+        <td><a href="./user/49">stu049</a></td>
+        <td>Kanya</td>
+        <td>Rattana</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="radio" name="user_id" value="50"/>
+        </td>
+        <td><a href="./user/50">stu050</a></td>
+        <td>Fah</td>
+        <td>Jaidee</td>
+      </tr>
+    </tbody>
+  </table>
+</form>
+
+      </div>
+
+    </div>
+  </body>
+</html>

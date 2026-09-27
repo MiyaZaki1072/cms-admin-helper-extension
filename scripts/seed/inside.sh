@@ -44,6 +44,7 @@ CONTEST_ID=$($PSQL -c "SELECT id FROM contests WHERE name = 'test'")
 
 echo "==> Users, teams, participations, submissions (contest id $CONTEST_ID)"
 python3 /seed/seed_data.py "$CONTEST_ID" /seed/solutions "$START"
+python3 /seed/seed_extras.py "$CONTEST_ID"
 
 echo
 echo "Done. Contest id: $CONTEST_ID"

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="./static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./static/reset.css">
+    <link rel="stylesheet" type="text/css" href="./static/aws_style.css">
+    <script src="./static/web_rpc.js"></script>
+    <script src="./static/aws_utils.js"></script>
+    <script src="./static/jq/jquery-3.6.0.min.js"></script>
+    <script src="./static/jq/jquery.jqplot.min.js"></script>
+    <script src="./static/jq/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="./static/jq/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="./static/sh/shCore.js"></script>
+    <script src="./static/sh/shBrushCpp.js"></script>
+    <script src="./static/sh/shBrushDelphi.js"></script>
+    <link rel="stylesheet" type="text/css" href="./static/jq/jquery.jqplot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="./static/sh/shCore.css"/>
+    <link rel="stylesheet" type="text/css" href="./static/sh/shThemeDefault.css"/>
+
+    <title>Admin</title>
+
+    <script>
+<!--
+function init()
+{
+    utils = new CMS.AWSUtils(".", 1790497340.560124, 0, 0, 0, 0, -1);
+    utils.update_notifications();
+    setInterval(function() { utils.update_notifications(); }, 15000);
+
+    $(document).click(utils.hide_subpage);
+
+    // delegate() ensures that the event is fired even for elements
+    // that are added in the future.
+    $(document).delegate('.toggling_on', 'click', utils.toggle_visibility);
+    $(document).delegate('.toggling_off', 'click', utils.toggle_visibility);
+
+}
+
+
+$(document).ready(init);
+
+//-->
+    </script>
+  </head>
+  <body class="admin">
+    <div id="global">
+      <div id="sidebar">
+        <div id="sidebar_header">
+          <div class="login_notice">
+            Hello, <a href="./admins">admin</a>.
+              <form class="inline" action="./logout" method="POST"><input type="hidden" name="_xsrf" value="2|75d0c5f9|a8d7ad98f8b2d90fd707793cde4b6fd1|1790497340"/><input type="submit" value="Logout"></form>
+          </div>
+          <h1 class="parent">Administration</h1>
+        </div>
+        <div class="secret_notice">
+          Change secret_key in cms.conf!<br/>
+          For example,<br/>
+          0d84cbafcd4e30727e44b5e1c1b00df4
+        </div>
+        <ul class="menu">
+          <li class="menu_entry"><a class="menu_link" href=".">Overview</a></li>
+          <li class="menu_entry"><a class="menu_link" href="./resourceslist">Resource usage</a></li>
+        </ul>
+        <div class="hr"></div>
+
+        <h1><a class="menu_link" href="./contests">Contests</a></h1>
+        <ul class="menu">
+
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./contest/1" title="Test Contest">
+              test
+            </a>
+          </li>
+
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./contests/add">
+              (create new contest...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./tasks">Tasks</a></h1>
+        <ul class="menu">
+
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./task/1" title="A plus B">
+              sum
+            </a>
+          </li>
+          <li class="menu_entry">
+            <a class="menu_link bold" href="./task/2" title="Largest Number">
+              max
+            </a>
+          </li>
+
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./tasks/add">
+              (create new task...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./users">Users</a></h1>
+        <ul class="menu">
+            <li>
+              <a class="menu_link" href="./users">
+                  (show the 51 users...)
+              </a>
+            </li>
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./users/add">
+              (create new user...)
+            </a>
+          </li>
+        </ul>
+
+        <h1><a class="menu_link" href="./teams">Teams</a></h1>
+        <ul class="menu">
+            <li>
+              <a class="menu_link" href="./teams">
+                  (show the 5 teams...)
+              </a>
+            </li>
+
+          <li class="menu_entry">
+            <a class="menu_link" href="./teams/add">
+              (create new team...)
+            </a>
+          </li>
+        </ul>
+        <div class="cr_notice">CMS <a href="http://github.com/cms-dev/cms/">codebase</a> is released under the<br/><a href="http://www.gnu.org/licenses/agpl.txt">GNU Affero General Public License</a>.</div>
+      </div>
+
+      <div id="border"></div>
+      <div id="core">
+        <div id="notifications" class="notifications"></div>
+        <div id="subpage" onclick="var event = arguments[0] || window.event; event.stopPropagation()">
+          <div id="subpage_border"></div>
+          <div id="subpage_background"></div>
+          <div id="subpage_content"></div>
+        </div>
+
+<div class="core_title">
+  <h1>Contests list</h1>
+</div>
+
+<form action="./contests" method="POST">
+  <input type="hidden" name="_xsrf" value="2|75d0c5f9|a8d7ad98f8b2d90fd707793cde4b6fd1|1790497340"/>
+  Edit selected contest:
+   <input type="submit"
+         name="operation"
+         value="Remove"
+         />
+  <table class="bordered">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <input type="radio" name="contest_id" value="1"/>
+        </td>
+        <td><a href="./contest/1">test</a></td>
+        <td>Test Contest</td>
+      </tr>
+    </tbody>
+  </table>
+</form>
+
+      </div>
+
+    </div>
+  </body>
+</html>
