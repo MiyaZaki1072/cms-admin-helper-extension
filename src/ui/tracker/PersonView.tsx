@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { Participation, Submission } from '@/core/model';
 import { formatDateTime, zoneLabel } from '@/core/time';
 import { type ReevaluationLevel, fetchParticipation, reevaluateParticipation } from '@/features/tracker/actions';
-import { type Contestant, summarizePerson } from '@/features/tracker/analysis';
+import { type ChangeFilter, type Contestant, matchesChange, scoreDeltas, summarizePerson } from '@/features/tracker/analysis';
 import type { Roster } from '@/features/tracker/roster';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { ExportMenu } from '../components/ExportMenu';
@@ -25,6 +25,7 @@ export function PersonView({ userId, roster, submissions }: Props) {
   const [participation, setParticipation] = useState<Participation | null>(null);
   const [partError, setPartError] = useState<string | null>(null);
   const [taskFilter, setTaskFilter] = useState<number | null>(null);
+  const [change, setChange] = useState<ChangeFilter>('any');
   const [dialog, setDialog] = useState<'message' | ReevaluationLevel | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -40,13 +41,18 @@ export function PersonView({ userId, roster, submissions }: Props) {
   };
   const own = useMemo(() => submissions.filter((s) => s.userId === userId).sort((a, b) => b.timestamp - a.timestamp), [submissions, userId]);
   const summary = useMemo(() => summarizePerson(userId, own, roster.tasks), [userId, own, roster.tasks]);
-  const listed = taskFilter === null ? own : own.filter((s) => s.taskId === taskFilter);
+  const deltas = useMemo(() => scoreDeltas(own), [own]);
+  const listed = useMemo(
+    () => own.filter((s) => (taskFilter === null || s.taskId === taskFilter) && matchesChange(deltas.get(s.id), change)),
+    [own, deltas, taskFilter, change],
+  );
 
   useEffect(() => {
     if (!contest) return;
     setParticipation(null);
     setPartError(null);
     setTaskFilter(null);
+    setChange('any');
     setNotice(null);
     let live = true;
     fetchParticipation(client, contest.id, userId).then(
@@ -193,16 +199,37 @@ export function PersonView({ userId, roster, submissions }: Props) {
       />
 
       <div class="cah-toolbar">
-        <h3>
-          Submissions{taskFilter !== null && ` — ${summary.tasks.find((t) => t.taskId === taskFilter)?.taskName}`}
-        </h3>
-        {taskFilter !== null && (
-          <button type="button" onClick={() => setTaskFilter(null)}>
-            Show all tasks
+        <h3>Submissions</h3>
+        <div class="cah-pills" role="group" aria-label="Filter by task" data-testid="task-pills">
+          <button type="button" class={taskFilter === null ? 'cah-pill cah-pill-on' : 'cah-pill'} aria-pressed={taskFilter === null} onClick={() => setTaskFilter(null)}>
+            All <span class="cah-muted">{own.length}</span>
           </button>
-        )}
+          {summary.tasks.map((t) => (
+            <button
+              key={t.taskId}
+              type="button"
+              class={taskFilter === t.taskId ? 'cah-pill cah-pill-on' : 'cah-pill'}
+              aria-pressed={taskFilter === t.taskId}
+              onClick={() => setTaskFilter(t.taskId)}
+            >
+              {t.taskName} <span class="cah-muted">{t.attempts}</span>
+            </button>
+          ))}
+        </div>
+        <label>
+          Change{' '}
+          <select value={change} onChange={(e) => setChange(e.currentTarget.value as ChangeFilter)} aria-label="Change">
+            <option value="any">Any</option>
+            <option value="gained">Gained points</option>
+            <option value="lost">Lost points</option>
+            <option value="same">No change</option>
+          </select>
+        </label>
+        <span class="cah-muted" data-testid="person-sub-count">
+          {listed.length} of {own.length}
+        </span>
       </div>
-      <SubmissionList submissions={listed} />
+      <SubmissionList submissions={listed} all={own} />
 
       {dialog === 'message' && (
         <MessageDialog target={{ contestId: contest.id, userId, username: contestant.username }} onClose={() => setDialog(null)} />

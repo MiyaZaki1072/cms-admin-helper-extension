@@ -79,7 +79,26 @@ export async function sendPrivateMessage(
   }
 }
 
+/** Submitted files never change, so their text is kept for the life of the tab. */
+const sourceCache = new Map<string, Promise<string>>();
+
 /** Source file text of a submission. */
 export function fetchSource(client: AwsClient, fileId: number): Promise<string> {
-  return client.getText(`submission_file/${fileId}`);
+  const path = `submission_file/${fileId}`;
+  const key = client.url(path);
+  let text = sourceCache.get(key);
+  if (!text) {
+    text = client.getText(path);
+    sourceCache.set(key, text);
+    text.catch(() => sourceCache.delete(key));
+  }
+  return text;
+}
+
+/** Larger files are offered as a download only. */
+export const MAX_SOURCE_CHARS = 1_000_000;
+
+/** True for text worth showing: not too large and without NUL or undecodable bytes. */
+export function isViewableSource(text: string): boolean {
+  return text.length <= MAX_SOURCE_CHARS && !/[\u0000�]/.test(text);
 }

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'preact/hooks';
 import type { Submission } from '@/core/model';
 import { formatDateTime, fromLocalInput, zoneLabel } from '@/core/time';
-import { type Filters, NO_FILTERS, type StatusFilter, applyFilters } from '@/features/tracker/analysis';
+import { type ChangeFilter, type Filters, NO_FILTERS, type StatusFilter, applyFilters, scoreDeltas } from '@/features/tracker/analysis';
 import type { Roster } from '@/features/tracker/roster';
 import { ExportMenu } from '../components/ExportMenu';
 import { SubmissionList } from './SubmissionList';
@@ -34,12 +34,13 @@ export function SubmissionsView({ roster, submissions, onUser }: Props) {
   const result = useMemo(() => applyFilters(submissions, filters, roster.contestants), [submissions, roster, JSON.stringify(filters)]);
   const set = (patch: Partial<typeof f>) => setF({ ...f, ...patch });
   const team = new Map(roster.contestants.map((c) => [c.userId, c.teamCode]));
+  const deltas = useMemo(() => scoreDeltas(submissions), [submissions]);
 
   const exportSheets = () => [
     {
       name: 'Submissions',
       rows: [
-        [`Time (${zoneLabel()})`, 'Time (UTC)', 'Id', 'Username', 'Team', 'Task', 'Status', 'Score', 'Max', 'Official'],
+        [`Time (${zoneLabel()})`, 'Time (UTC)', 'Id', 'Username', 'Team', 'Task', 'Status', 'Score', 'Max', 'Change', 'Official'],
         ...result.map((s) => [
           formatDateTime(s.timestamp),
           new Date(s.timestamp).toISOString(),
@@ -50,6 +51,7 @@ export function SubmissionsView({ roster, submissions, onUser }: Props) {
           s.statusText,
           s.score,
           s.maxScore,
+          deltas.get(s.id) ?? '',
           s.official ? 'yes' : 'no',
         ]),
       ],
@@ -99,6 +101,15 @@ export function SubmissionsView({ roster, submissions, onUser }: Props) {
           </select>
         </label>
         <label>
+          Change
+          <select value={f.change} onChange={(e) => set({ change: e.currentTarget.value as ChangeFilter })} aria-label="Change">
+            <option value="any">Any</option>
+            <option value="gained">Gained points</option>
+            <option value="lost">Lost points</option>
+            <option value="same">No change</option>
+          </select>
+        </label>
+        <label>
           Score
           <span class="cah-range">
             <input type="number" placeholder="min" value={f.scoreMin ?? ''} onInput={(e) => set({ scoreMin: num(e.currentTarget.value) })} aria-label="Minimum score" />
@@ -137,7 +148,7 @@ export function SubmissionsView({ roster, submissions, onUser }: Props) {
         <span class="cah-spacer" />
         <ExportMenu name="submissions" sheets={exportSheets} />
       </div>
-      <SubmissionList submissions={result} showUser onUser={onUser} />
+      <SubmissionList submissions={result} all={submissions} showUser onUser={onUser} />
     </div>
   );
 }

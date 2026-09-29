@@ -5,6 +5,8 @@ node_modules/
 dist/
 *.zip
 *.xpi
+# Ready-to-install builds linked from the README (refresh with `pnpm release`)
+!releases/*.zip
 coverage/
 playwright-report/
 test-results/

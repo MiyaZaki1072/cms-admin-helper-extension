@@ -7,6 +7,8 @@ import {
   buildGrid,
   flagsFor,
   improvedIds,
+  matchesChange,
+  scoreDeltas,
   searchContestants,
   summarizePerson,
 } from '@/features/tracker/analysis';
@@ -132,6 +134,42 @@ describe('filters', () => {
   it('improved score only', () => {
     expect(improvedIds(subs)).toEqual(new Set([subs[0]!.id, subs[2]!.id, subs[4]!.id]));
     expect(applyFilters(subs, { ...NO_FILTERS, improvedOnly: true }, roster).map((s) => s.score)).toEqual([100, 80, 30]);
+  });
+  it('by score change', () => {
+    expect(applyFilters(subs, { ...NO_FILTERS, change: 'gained' }, roster).map((s) => s.score)).toEqual([80]);
+    expect(applyFilters(subs, { ...NO_FILTERS, change: 'lost' }, roster).map((s) => s.score)).toEqual([20]);
+    expect(applyFilters(subs, { ...NO_FILTERS, change: 'same' }, roster)).toEqual([]);
+  });
+});
+
+describe('scoreDeltas', () => {
+  it('score minus the previous scored official submission, per user and task', () => {
+    const a1 = sub(1, 1, 1, 'scored', 30);
+    const a2 = sub(1, 1, 2, 'compilation_failed');
+    const a3 = sub(1, 1, 3, 'scored', 70);
+    const a4 = sub(1, 1, 4, 'scored', 40);
+    const a5 = sub(1, 1, 5, 'scored', 40);
+    const other = sub(1, 2, 6, 'scored', 10);
+    const b1 = sub(2, 1, 7, 'scored', 100);
+    const pending = sub(1, 1, 8, 'evaluating');
+    const unofficial = { ...sub(1, 1, 9, 'scored', 0), official: false };
+    const d = scoreDeltas([pending, a5, b1, a4, other, a3, a2, a1, unofficial]);
+    expect(d.get(a1.id)).toBeUndefined();
+    expect(d.get(a2.id)).toBeUndefined();
+    expect(d.get(a3.id)).toBe(40);
+    expect(d.get(a4.id)).toBe(-30);
+    expect(d.get(a5.id)).toBe(0);
+    expect(d.get(other.id)).toBeUndefined();
+    expect(d.get(b1.id)).toBeUndefined();
+    expect(d.get(pending.id)).toBeUndefined();
+    expect(d.get(unofficial.id)).toBeUndefined();
+  });
+
+  it('matchesChange', () => {
+    expect([undefined, -5, 0, 5].map((v) => matchesChange(v, 'any'))).toEqual([true, true, true, true]);
+    expect([undefined, -5, 0, 5].map((v) => matchesChange(v, 'gained'))).toEqual([false, false, false, true]);
+    expect([undefined, -5, 0, 5].map((v) => matchesChange(v, 'lost'))).toEqual([false, true, false, false]);
+    expect([undefined, -5, 0, 5].map((v) => matchesChange(v, 'same'))).toEqual([false, false, true, false]);
   });
 });
 

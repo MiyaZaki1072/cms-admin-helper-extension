@@ -61,6 +61,9 @@ export interface GridRow extends PersonSummary {
 
 export type StatusFilter = 'any' | 'scored' | 'compilation_failed' | 'pending';
 
+/** Score change against the user's previous scored submission on the task. */
+export type ChangeFilter = 'any' | 'gained' | 'lost' | 'same';
+
 export interface Filters {
   userIds: number[];
   teamCode: string;
@@ -72,6 +75,7 @@ export interface Filters {
   from: number | null;
   to: number | null;
   improvedOnly: boolean;
+  change: ChangeFilter;
 }
 
 export const NO_FILTERS: Filters = {
@@ -84,6 +88,7 @@ export const NO_FILTERS: Filters = {
   from: null,
   to: null,
   improvedOnly: false,
+  change: 'any',
 };
 
 export function byUser(submissions: Iterable<Submission>): Map<number, Submission[]> {
@@ -186,6 +191,37 @@ export function improvedIds(submissions: Iterable<Submission>): Set<number> {
   return out;
 }
 
+/**
+ * Score of each official scored submission minus the user's previous official
+ * scored submission on the same task. Missing (read as null) for the first one
+ * on a task and for anything not scored or not official.
+ */
+export function scoreDeltas(submissions: Iterable<Submission>): Map<number, number> {
+  const last = new Map<string, number>();
+  const out = new Map<number, number>();
+  for (const s of [...submissions].sort(chronological)) {
+    if (s.status !== 'scored' || !s.official || s.score === null) continue;
+    const key = `${s.userId}:${s.taskId}`;
+    const prev = last.get(key);
+    if (prev !== undefined) out.set(s.id, s.score - prev);
+    last.set(key, s.score);
+  }
+  return out;
+}
+
+export function matchesChange(delta: number | undefined, change: ChangeFilter): boolean {
+  switch (change) {
+    case 'any':
+      return true;
+    case 'gained':
+      return delta !== undefined && delta > 0;
+    case 'lost':
+      return delta !== undefined && delta < 0;
+    case 'same':
+      return delta === 0;
+  }
+}
+
 export function matchesStatus(s: Submission, status: StatusFilter): boolean {
   switch (status) {
     case 'any':
@@ -203,6 +239,7 @@ export function applyFilters(submissions: Iterable<Submission>, filters: Filters
   const users = filters.userIds.length > 0 ? new Set(filters.userIds) : null;
   const team = filters.teamCode ? new Set(roster.filter((c) => c.teamCode === filters.teamCode).map((c) => c.userId)) : null;
   const improved = filters.improvedOnly ? improvedIds(all) : null;
+  const deltas = filters.change !== 'any' ? scoreDeltas(all) : null;
   return all
     .filter(
       (s) =>
@@ -214,7 +251,8 @@ export function applyFilters(submissions: Iterable<Submission>, filters: Filters
         (filters.scoreMax === null || (s.score !== null && s.score <= filters.scoreMax)) &&
         (filters.from === null || s.timestamp >= filters.from) &&
         (filters.to === null || s.timestamp <= filters.to) &&
-        (!improved || improved.has(s.id)),
+        (!improved || improved.has(s.id)) &&
+        (!deltas || matchesChange(deltas.get(s.id), filters.change)),
     )
     .sort((a, b) => b.timestamp - a.timestamp || b.id - a.id);
 }

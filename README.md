@@ -26,18 +26,29 @@ submits the same forms an admin would, with the admin's own logged-in session, a
 
 ## Install
 
-Download the release zip for your browser.
+No building needed — the ready-to-use extension is in the [`releases/`](releases/) folder.
 
 **Chrome / Edge**
 
-1. Unzip `cms-admin-helper-<version>-chrome.zip`.
-2. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and choose the unzipped folder.
+1. Download **[cms-admin-helper-chrome.zip](https://github.com/MiyaZaki1072/cms-admin-helper-extension/raw/main/releases/cms-admin-helper-chrome.zip)**.
+2. Unzip it (right-click → **Extract All…**). Keep the unzipped folder somewhere permanent — the browser loads the
+   extension from it, so don't delete it afterwards.
+3. Open `chrome://extensions` (Edge: `edge://extensions`).
+4. Turn on **Developer mode** (switch in the top-right corner; bottom-left in Edge).
+5. Click **Load unpacked** and choose the unzipped folder (the one that has `manifest.json` directly inside it).
+6. Optional: click the puzzle-piece icon in the toolbar and pin **CMS Admin Helper**.
 
 **Firefox** (version 140 or newer)
 
-- Install the signed `.xpi` from the release page (unlisted add-on, signed by Mozilla).
-- For testing only: `about:debugging` → **This Firefox** → **Load Temporary Add-on** → choose `manifest.json` inside the
-  unzipped `cms-admin-helper-<version>-firefox.zip`. It is removed when Firefox closes.
+1. Download **[cms-admin-helper-firefox.zip](https://github.com/MiyaZaki1072/cms-admin-helper-extension/raw/main/releases/cms-admin-helper-firefox.zip)** and unzip it.
+2. Open `about:debugging`, click **This Firefox**, then **Load Temporary Add-on…**.
+3. Choose `manifest.json` inside the unzipped folder.
+
+Firefox removes temporary add-ons when it closes, so repeat steps 2–3 after each restart.
+
+**Updating to a new version:** download the new zip, replace the contents of the same folder with it, then click the
+reload arrow on the extension's card in `chrome://extensions` (Firefox: **Reload** in `about:debugging`) and reload the
+AWS tab.
 
 ## Set up
 
@@ -61,10 +72,16 @@ The first time you open a contest, the helper reads all its submission pages onc
 After that **Sync now** usually needs a single request; **Live** re-syncs every 15–60 seconds while the helper is open.
 
 - **People** — search by username, name or team (press `/` to jump to the search box). Click a name to see their score
-  matrix, timeline and submissions; click a task row to see only that task. **Details** shows testcase results, compilation
-  output and the source. **Message…**, **Re-evaluate…** and **Edit participation** act on that contestant.
+  matrix, timeline and submissions. The task buttons above the list (**All · sum · max**) or a click on a task row show only
+  that task. **Details** shows testcase results and compilation output. **Message…**, **Re-evaluate…** and
+  **Edit participation** act on that contestant.
+- **Code** — on any submission, opens its source with line numbers. **◀ Previous / Next ▶** (or the ← → keys) step through
+  that contestant's submissions on the same task, and **Compare with previous** shows which lines were added (green) and
+  removed (red) since the submission before. The **Change** column shows how the score moved against their previous scored
+  submission on the task (`+40`, `−20`, `±0`), and the **Change** filter keeps only submissions that gained or lost points.
 - **Grid** — every contestant × task, sortable, with flags; click a row to open that person.
-- **Submissions** — filter by users, team, task, status, score range, time window (in your timezone) or *improved score only*.
+- **Submissions** — filter by users, team, task, status, score change, score range, time window (in your timezone) or
+  *improved score only*.
 - **Compare** — tick 2 to 4 contestants.
 - **Export** — CSV or XLSX of what you are looking at.
 
@@ -141,6 +158,7 @@ pnpm dev:firefox
 pnpm check           # typecheck, unit tests, Chrome + Firefox builds
 pnpm test:e2e        # end-to-end tests against a local CMS v1.5
 pnpm zip             # release zips in .output/
+pnpm release         # build the zips and copy them into releases/ (the README download links)
 ```
 
 - [docs/dev-server.md](docs/dev-server.md) — a local CMS v1.5 with test data (Docker).
@@ -151,7 +169,9 @@ Built with [WXT](https://wxt.dev) (Manifest V3), TypeScript, Preact, PapaParse, 
 ### Releasing
 
 1. Bump `version` in `package.json`, then `pnpm check && pnpm test:e2e`.
-2. `pnpm zip` → `.output/cms-admin-helper-<version>-chrome.zip`, `-firefox.zip` and `-sources.zip`.
+2. `pnpm release` → builds `.output/cms-admin-helper-<version>-chrome.zip`, `-firefox.zip` and `-sources.zip`, and
+   copies the Chrome and Firefox zips to `releases/cms-admin-helper-chrome.zip` / `-firefox.zip`, which the Install
+   links point to. Commit the updated `releases/` folder.
 3. Sign the Firefox build as an unlisted add-on with your AMO API credentials
    ([addons.mozilla.org/developers/addon/api/key](https://addons.mozilla.org/developers/addon/api/key/)):
 
@@ -162,4 +182,4 @@ Built with [WXT](https://wxt.dev) (Manifest V3), TypeScript, Preact, PapaParse, 
 
    Upload `-sources.zip` if AMO asks for the source code. `web-ext lint` shows two warnings inside Preact's renderer
    (`innerHTML` in its `dangerouslySetInnerHTML` path, which this extension never uses).
-4. Attach the Chrome zip and the signed `.xpi` to the release.
+4. Optionally also attach the Chrome zip and the signed `.xpi` to a GitHub release.

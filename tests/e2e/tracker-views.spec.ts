@@ -66,6 +66,49 @@ test('grid, filters, submission detail and export', async ({ context, extensionI
   expect(bytes.subarray(0, 2).toString()).toBe('PK');
 });
 
+test('task filter, score changes and the code viewer', async ({ context, extensionId }) => {
+  await configure(context, extensionId);
+  const page = await context.newPage();
+  await loginAws(page);
+  const overlay = await openSynced(page);
+  // stu016 has 8 submissions on max in the seed.
+  await overlay.locator('.cah-pick[data-username="stu016"]').click();
+  await expect(overlay.getByTestId('person-username')).toHaveText('stu016');
+
+  // Task buttons: only that task's submissions, as many as the matrix says.
+  const pill = overlay.getByTestId('task-pills').getByRole('button', { name: /^max/ });
+  const attempts = Number((await pill.locator('.cah-muted').textContent())?.trim());
+  expect(attempts).toBeGreaterThanOrEqual(2);
+  await pill.click();
+  await expect(pill).toHaveAttribute('aria-pressed', 'true');
+  const rows = overlay.getByTestId('submission-list').locator('tbody tr');
+  await expect(rows).toHaveCount(attempts);
+  for (const text of await rows.locator('td:nth-child(2)').allTextContents()) expect(text).toBe('max');
+
+  // Code of the oldest one, then step to the next and compare with it.
+  await rows.last().getByRole('button', { name: 'Code' }).click();
+  const viewer = overlay.getByTestId('code-viewer');
+  await expect(viewer.getByTestId('code-position')).toHaveText(`1 of ${attempts}`);
+  await expect(viewer.getByTestId('code-source').locator('.cah-code-line').first()).toBeVisible();
+  await expect(viewer.getByLabel('Compare with previous')).toBeDisabled();
+  await viewer.getByRole('button', { name: 'Next ▶' }).click();
+  await expect(viewer.getByTestId('code-position')).toHaveText(`2 of ${attempts}`);
+  await viewer.getByLabel('Compare with previous').check();
+  await expect(viewer.getByTestId('code-diff-summary')).toContainText('Compared with #');
+  await viewer.press('ArrowLeft');
+  await expect(viewer.getByTestId('code-position')).toHaveText(`1 of ${attempts}`);
+  await viewer.press('Escape');
+  await expect(viewer).toHaveCount(0);
+  await expect(overlay.getByTestId('person-view')).toBeVisible();
+
+  // Contest-wide: "Gained points" leaves only positive changes.
+  await overlay.getByRole('button', { name: 'Submissions' }).click();
+  await overlay.getByLabel('Change').selectOption('gained');
+  const deltas = await overlay.getByTestId('submission-list').getByTestId('delta').allTextContents();
+  expect(deltas.length).toBeGreaterThan(0);
+  for (const d of deltas) expect(d).toMatch(/^\+\d/);
+});
+
 test('compare two contestants', async ({ context, extensionId }) => {
   await configure(context, extensionId);
   const page = await context.newPage();

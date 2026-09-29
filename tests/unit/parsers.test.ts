@@ -227,6 +227,26 @@ describe('lists', () => {
     });
   });
 
+  it('ranking without a Team column (no participation has a team)', () => {
+    const doc = fixture('contest-ranking.html');
+    for (const tr of doc.querySelectorAll('#ranking-table tr')) tr.children[2]?.remove();
+    const ranking = parseRanking(doc);
+    expect(ranking.tasks).toEqual([
+      { id: 1, name: 'sum' },
+      { id: 2, name: 'max' },
+    ]);
+    expect(ranking.rows).toHaveLength(49);
+    expect(ranking.rows[0]).toEqual({
+      userId: 18,
+      username: 'stu018',
+      fullName: 'Suda Wongsa',
+      teamId: null,
+      teamName: '',
+      scores: { 1: 100, 2: 100 },
+      total: 200,
+    });
+  });
+
   it('ranking CSV agrees with the ranking page', () => {
     const csvFirst = fixtureText('contest-ranking.csv').split(/\r?\n/)[1];
     expect(csvFirst).toBe('stu018,Suda Wongsa,Team CNX01,100.0,,100.0,,200.0,');

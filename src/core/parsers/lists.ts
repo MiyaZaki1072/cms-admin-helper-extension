@@ -70,8 +70,10 @@ export function parseRanking(doc: Document): { tasks: Array<{ id: number; name: 
   const table = doc.querySelector(RANKING.table);
   if (!table) throw new ParseError(parser, 'ranking table not found');
   const head = headers(table);
-  const taskHeaders = [...table.querySelectorAll(':scope > thead > tr > th')].slice(RANKING.fixedHeaders.length, -1);
-  expectHeaders(parser, table, [...RANKING.fixedHeaders, ...head.slice(3, -1), RANKING.lastHeader]);
+  const hasTeams = head[RANKING.fixedHeaders.length] === RANKING.teamHeader;
+  const fixed = hasTeams ? [...RANKING.fixedHeaders, RANKING.teamHeader] : [...RANKING.fixedHeaders];
+  const taskHeaders = [...table.querySelectorAll(':scope > thead > tr > th')].slice(fixed.length, -1);
+  expectHeaders(parser, table, [...fixed, ...head.slice(fixed.length, -1), RANKING.lastHeader]);
   const tasks = taskHeaders.map((th) => {
     const link = th.querySelector('a');
     const id = idFrom(HREF.task, link?.getAttribute('href'));
@@ -83,20 +85,20 @@ export function parseRanking(doc: Document): { tasks: Array<{ id: number; name: 
     rows: rows(table).map((td, i) => {
       const userLink = td[0]?.querySelector('a');
       const userId = idFrom(HREF.participation, userLink?.getAttribute('href'), 2);
-      if (userId === null || td.length !== 3 + tasks.length + 1) {
+      if (userId === null || td.length !== fixed.length + tasks.length + 1) {
         throw new ParseError(parser, `row ${i + 1} does not match the header`);
       }
-      const teamLink = td[2]?.querySelector('a');
+      const teamCell = hasTeams ? td[2] : undefined;
       const scores: Record<number, number> = {};
       tasks.forEach((task, t) => {
-        scores[task.id] = num(text(td[3 + t])) ?? 0;
+        scores[task.id] = num(text(td[fixed.length + t])) ?? 0;
       });
       return {
         userId,
         username: text(userLink),
         fullName: text(td[1]),
-        teamId: idFrom(HREF.team, teamLink?.getAttribute('href')),
-        teamName: text(td[2]),
+        teamId: idFrom(HREF.team, teamCell?.querySelector('a')?.getAttribute('href')),
+        teamName: teamCell ? text(teamCell) : '',
         scores,
         total: num(text(td[td.length - 1])) ?? 0,
       };

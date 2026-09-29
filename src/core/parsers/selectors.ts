@@ -95,7 +95,9 @@ export const LISTS = {
 
 export const RANKING = {
   table: '#ranking-table',
-  fixedHeaders: ['Username', 'User', 'Team'],
+  fixedHeaders: ['Username', 'User'],
+  /** AWS shows this column only when some participation in the contest has a team. */
+  teamHeader: 'Team',
   lastHeader: 'Global',
 } as const;
 
